@@ -1,3 +1,7 @@
+"use client";
+import { Box, Button, Modal } from "@mui/material";
+import { useState } from "react"
+
 type Event = {
     title: string
     date: string
@@ -18,27 +22,49 @@ type Attendee = {
     supplies?: Supply[]
 }
 
-async function loadEvent(): Promise<Event> {
-
-    return new Promise((resolve) => {
-        const event: Event = {
-            title: 'VolleyBAYll',
-            date: '2021-01-01',
-            description: 'My Event Description',
-            location: 'Las Palmas Park, Sunnyvale, CA',
-            attendees: [
-                { name: 'Chase', supplies: [{ item: 'Ball', quantity: 1 }], guests: ['Kasey']  },
-                { name: 'Ashwin', supplies: [{ item: 'Ball', quantity: 1 }, { item: 'Net', quantity: 1}], guests: ['Vivian'] },
-                { name: 'Jiwan', supplies: [{ item: 'Ball', quantity: 1 }, { item: 'Net', quantity: 2}]  }
-            ],
-            changelog: [],
-        }
-        resolve(event)
-    })
+function loadEvent(): Event {
+    return {
+        title: 'VolleyBAYll',
+        date: '2021-01-01',
+        description: 'My Event Description',
+        location: 'Las Palmas Park, Sunnyvale, CA',
+        attendees: [
+            { name: 'Chase', supplies: [{ item: 'Ball', quantity: 1 }], guests: ['Kasey'] },
+            { name: 'Ashwin', supplies: [{ item: 'Ball', quantity: 1 }, { item: 'Net', quantity: 1 }], guests: ['Vivian'] },
+            { name: 'Jiwan', supplies: [{ item: 'Ball', quantity: 1 }, { item: 'Net', quantity: 2 }] }
+        ],
+        changelog: [],
+    }
 }
 
-export default async function Event() {
-    const event = await loadEvent();
+const style = {
+    position: 'absolute' as 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    p: 4,
+};
+
+function RsvpModal() {
+    return (
+        <Box sx={style}>
+            <form>
+                <input type="text" placeholder="Name" />
+                <button>RSVP</button>
+            </form>
+        </Box>
+    )
+}
+
+export default function Event() {
+    const [showRsvp, setShowRsvp] = useState(false);
+
+    // TODO: Load event from database
+    const event = loadEvent();
     const { title, date, description, location, attendees, changelog } = event;
 
     const supplies = Object.values(attendees.reduce((acc, attendee) => {
@@ -49,7 +75,7 @@ export default async function Event() {
             if (acc[item]) {
                 acc[item].quantity += 1;
             } else {
-                acc[item] = {item, quantity};
+                acc[item] = { item, quantity };
             }
         });
         return acc;
@@ -65,12 +91,14 @@ export default async function Event() {
                 <h3>{date}</h3>
             </div>
 
-            <button>RSVP</button>
+            <Button onClick={() => setShowRsvp(true)}>
+                RSVP
+            </Button>
 
             <div>
                 <h2>Attending</h2>
                 <ul>
-                    {attendees.map(({name}) => (
+                    {attendees.map(({ name }) => (
                         <li key={name}>{name}</li>
                     ))}
                 </ul>
@@ -79,8 +107,10 @@ export default async function Event() {
             <div>
                 <h2>Supplies</h2>
                 <ul>
-                    {supplies.map(({item, quantity}) => (
-                        <li key={item}>{item} - {quantity}</li>
+                    {supplies.map(({ item, quantity }) => (
+                        <li key={item}>
+                            {quantity} {item}{quantity > 1 ? 's' : ''}
+                        </li>
                     ))}
                 </ul>
             </div>
@@ -95,6 +125,13 @@ export default async function Event() {
                     </ul>
                 </div>
             )}
+
+            <Modal
+                open={showRsvp}
+                onClose={() => setShowRsvp(false)}
+            >
+                <RsvpModal />
+            </Modal>
         </div>
     )
 }
