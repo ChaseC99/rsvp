@@ -1,14 +1,5 @@
 import EventPage from "./event";
-import { EVENT_QUERY } from "../queries";
-
-import type {
-    Event,
-} from "../types";
-
-async function loadEvent(id: string): Promise<Event> {
-    const result = await EVENT_QUERY(id);
-    return result.rows[0].event;
-}
+import { loadEvent } from "../queries";
 
 // This is a server-side rendered component,
 // so that it can easily load data from the database

@@ -1,19 +1,37 @@
 "use client";
 import { Box, Button, Modal } from "@mui/material";
-import { useState } from "react"
-
+import { useRef, useState } from "react"
 import type {
     Attendee,
     Event,
     Supply,
 } from "../types";
 
-function RsvpModal() {
+function RsvpModal({ eventId, onClose }: { eventId: string, onClose: () => void }) {
+    const nameRef = useRef<HTMLInputElement>(null);
+
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        const endpoint = '/api/rsvp';
+        const name = nameRef.current?.value;
+
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ eventId, attendee: { name } }),
+        }
+
+        await fetch(endpoint, options);
+        onClose();
+    }
+
     return (
         <Box sx={styles.modal}>
-            <form>
-                <input type="text" placeholder="Name" />
-                <button>RSVP</button>
+            <form onSubmit={handleSubmit} method="post">
+                <input type="text" id="name" ref={nameRef} placeholder="Name" />
+                <button type="submit">RSVP</button>
             </form>
         </Box>
     )
@@ -76,7 +94,7 @@ function Changelog(changes: string[]) {
 
 export default function EventPage({ event }: { event: Event }) {
     const [showRsvp, setShowRsvp] = useState(false);
-    const { title, date, description, location, attendees, changelog } = event;
+    const { title, id, date, description, location, attendees, changelog } = event;
 
     return (
         <div>
@@ -98,7 +116,12 @@ export default function EventPage({ event }: { event: Event }) {
                 open={showRsvp}
                 onClose={() => setShowRsvp(false)}
             >
-                <RsvpModal />
+                <div>
+                    <RsvpModal
+                        eventId={id}
+                        onClose={() => setShowRsvp(false)}
+                    />
+                </div>
             </Modal>
         </div>
     )

@@ -1,14 +1,5 @@
 import EventsList from "./events-list";
-import { EVENTS_QUERY } from "./queries";
-import type {
-  Event,
-} from "./types";
-
-async function loadEvents(): Promise<Event[]> {
-  const result = await EVENTS_QUERY;
-
-  return result.rows.map((row) => row.event);
-}
+import { loadEvents } from "./queries";
 
 export default async function Home() {
   const events = await loadEvents()

@@ -1,8 +1,25 @@
-import { sql } from "@vercel/postgres";
+// NOTE: These exports can only be used by the /api and server rendered components
+// because the sql import needs the postgres .env variable, which is not available on the client
+import { db, sql } from "@vercel/postgres";
+import { Attendee, Event } from "./types";
+
+export async function loadEvents(): Promise<Event[]> {
+    const result = await EVENTS_QUERY;
+    return result.rows.map((row) => row.event);
+}
+
+export async function loadEvent(id: string): Promise<Event> {
+    const result = await EVENT_QUERY(id);
+    return result.rows[0].event;
+}
+
+export async function rsvpToEvent(attendee: Attendee, eventId: string): Promise<void> {
+    const { name } = attendee;
+    await db.query(RSVP_TO_EVENT, [name, eventId]);
+}
 
 // Queries generated courtesy of GitHub Copilot :)
-
-export const EVENTS_QUERY = sql`
+const EVENTS_QUERY = sql`
 SELECT JSON_BUILD_OBJECT(
     'title', e.title,
     'id', e.id,
@@ -31,7 +48,7 @@ FROM events e
 LEFT JOIN attendees a ON e.id = a.event_id
 GROUP BY e.id;`
 
-export const EVENT_QUERY = (id: string) => sql`
+const EVENT_QUERY = (id: string) => sql`
 SELECT JSON_BUILD_OBJECT(
     'title', e.title,
     'id', e.id,
@@ -60,3 +77,7 @@ FROM events e
 LEFT JOIN attendees a ON e.id = a.event_id
 WHERE e.id = ${id}
 GROUP BY e.id;`;
+
+const RSVP_TO_EVENT = `
+    INSERT INTO attendees (name, event_id, supplies_id, guests)
+    VALUES ($1, $2, NULL, NULL)`
