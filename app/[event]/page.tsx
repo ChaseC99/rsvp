@@ -12,5 +12,9 @@ export default async function EventPageLoader(
     const { params: { event: eventId } } = props;
     const event = await loadEvent(eventId);
 
+    if (!event) {
+        return <div>Event not found</div>
+    }
+
     return <EventPage event={event} />
 }

@@ -20,9 +20,9 @@ function RsvpModal({ eventId, onClose }: { eventId: string, onClose: () => void 
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ eventId, attendee: { name } }),
+            body: JSON.stringify({ attendee: { name, eventId } }),
         }
-
+        
         await fetch(endpoint, options);
         onClose();
     }
@@ -51,27 +51,29 @@ function Attending(attendees: Attendee[]) {
 }
 
 function Supplies(attendees: Attendee[]) {
-    const supplies = Object.values(attendees.reduce((acc, attendee) => {
+    const supplies = Object.values(attendees).reduce((acc, attendee) => {
         if (!attendee.supplies) return acc;
 
         attendee.supplies.forEach((supply) => {
             const { item, quantity } = supply;
             if (acc[item]) {
-                acc[item].quantity += 1;
+                acc[item] += 1;
             } else {
-                acc[item] = { item, quantity };
+                acc[item] = quantity;
             }
         });
         return acc;
-    }, {} as Record<string, Supply>));
+    }, {} as Record<string, number>);
 
     return (
         <div>
             <h2>Supplies</h2>
             <ul>
-                {supplies.map(({ item, quantity }) => (
+                {/* Iterate over the supplies */}
+                {Object.entries(supplies).map(([item, quantity]) => (
                     <li key={item}>
-                        {quantity} {item}{quantity > 1 ? 's' : ''}
+                        {quantity} {item}
+                        {quantity > 1 ? "s" : ""}
                     </li>
                 ))}
             </ul>
@@ -101,7 +103,7 @@ export default function EventPage({ event }: { event: Event }) {
             <h1>{title}</h1>
             <div>
                 <h3>{location}</h3>
-                <h3>{date}</h3>
+                <h3>{date.toDateString()}</h3>
             </div>
 
             <Button onClick={() => setShowRsvp(true)}>

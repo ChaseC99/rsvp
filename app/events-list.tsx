@@ -1,9 +1,7 @@
 import Link from "next/link";
-import type { 
-    Event, 
-} from "./types";
+import type { Event } from "@prisma/client";
 
-export default function EventsList({events}: {events: Event[]}) {
+export default function EventsList({ events }: { events: Event[] }) {
     return (
         <div>
             <h1>Events</h1>
@@ -14,7 +12,7 @@ export default function EventsList({events}: {events: Event[]}) {
                             {title}
                         </Link>
                         <br />
-                        {date}
+                        {date.toDateString()}
                     </li>
                 ))}
             </ul>

@@ -1,20 +1,15 @@
-export type Event = {
-    title: string
-    id: string
-    date: string
-    description: string
-    location: string
-    attendees: Attendee[]
-    changelog: string[]
-}
+import type { 
+    Event as PrismaEvent, 
+    Attendee as PrismaAttendee,
+    Supply as PrismaSupply, 
+} from "@prisma/client";
 
-export type Supply = {
-    item: string
-    quantity: number
-}
+export type Supply = Omit<PrismaSupply, "attendee">;
 
-export type Attendee = {
-    name: string
-    guests?: string[]
-    supplies?: Supply[]
-}
+export type Attendee = Omit<PrismaAttendee, "supplies"> & {
+    supplies: PrismaSupply[];
+};
+
+export type Event = Omit<PrismaEvent, "attendees"> & {
+    attendees: Attendee[];
+};

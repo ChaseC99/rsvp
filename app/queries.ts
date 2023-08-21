@@ -1,83 +1,124 @@
 // NOTE: These exports can only be used by the /api and server rendered components
-// because the sql import needs the postgres .env variable, which is not available on the client
-import { db, sql } from "@vercel/postgres";
-import { Attendee, Event } from "./types";
+// If you need to use a query in a client side component, you should create a new api route
+// that the client side component can call instead
+import { PrismaClient } from '@prisma/client'
+import type { Event, Attendee } from './types';
 
+// Initial Prisma client 
+const prisma = new PrismaClient()
+
+// EVENT QUERIES
+/**
+ * Loads all events
+ * @returns a list of all events
+ */
 export async function loadEvents(): Promise<Event[]> {
-    const result = await EVENTS_QUERY;
-    return result.rows.map((row) => row.event);
+    const events = await prisma.event.findMany({
+        include: { 
+            attendees: {
+                include: { supplies: true }
+            }
+         }
+    });
+    return events;
 }
 
-export async function loadEvent(id: string): Promise<Event> {
-    const result = await EVENT_QUERY(id);
-    return result.rows[0].event;
+/**
+ * Load a single event by id
+ * @param id Event id
+ * @returns event if it exists
+ */
+export async function loadEvent(id: string): Promise<Event | null> {
+    const event = await prisma.event.findUnique({
+        where: {
+            id: id
+        },
+        include: {
+            attendees: {
+                include: { supplies: true }
+            }
+        }
+    });
+    return event;
 }
 
-export async function rsvpToEvent(attendee: Attendee, eventId: string): Promise<void> {
-    const { name } = attendee;
-    await db.query(RSVP_TO_EVENT, [name, eventId]);
+/**
+ * Create a new event
+ * @param event
+ * @returns id of the created event
+ */
+export async function createEvent(event: Event): Promise<String> {
+    // Attendees are created separately, so it's fine to remove them from the event data
+    const { attendees, ...eventData } = event;
+
+    const createdEvent = await prisma.event.create({
+        data: {
+            ...eventData,
+        }
+    });
+    
+    return createdEvent.id;
+};
+
+/**
+ * Update an existing event
+ * @param event 
+ */
+export async function updateEvent(event: Event): Promise<void> {
+    // TODO
+};
+
+/**
+ * Delete an event
+ * @param eventId 
+ */
+export async function deleteEvent(eventId: string): Promise<void> {
+    // TODO
+};
+
+// RSVP QUERIES
+/**
+ * Create a new attendee for an event
+ * @param attendee 
+ * @param eventId 
+ */
+export async function createRsvp(attendee: Attendee): Promise<void> {
+    const resp = await prisma.attendee.create({
+        data: {
+            ...attendee,
+            supplies: {
+                create: attendee.supplies
+            },
+        }
+    });
 }
 
-// Queries generated courtesy of GitHub Copilot :)
-const EVENTS_QUERY = sql`
-SELECT JSON_BUILD_OBJECT(
-    'title', e.title,
-    'id', e.id,
-    'date', e.date,
-    'description', e.description,
-    'location', e.location,
-    'attendees', JSON_AGG(
-      JSON_BUILD_OBJECT(
-        'name', a.name,
-        'guests', a.guests,
-        'supplies', (
-          SELECT JSON_AGG(
-            JSON_BUILD_OBJECT(
-              'item', s.item,
-              'quantity', s.quantity
-            )
-          )
-          FROM supplies s
-          WHERE s.id = a.supplies_id
-        )
-      )
-    ),
-    'changelog', e.changelog
-  ) AS event
-FROM events e
-LEFT JOIN attendees a ON e.id = a.event_id
-GROUP BY e.id;`
+/**
+ * Update an attendee for an event
+ * @param attendee 
+ * @param eventId 
+ */
+export async function updateRsvp(attendee: Attendee): Promise<void> {
+    await prisma.attendee.update({
+        where: {
+            id: attendee.id
+        },
+        data: {
+            ...attendee,
+            supplies: {
+                create: attendee.supplies
+            },
+        }})
+}
 
-const EVENT_QUERY = (id: string) => sql`
-SELECT JSON_BUILD_OBJECT(
-    'title', e.title,
-    'id', e.id,
-    'date', e.date,
-    'description', e.description,
-    'location', e.location,
-    'attendees', JSON_AGG(
-      JSON_BUILD_OBJECT(
-        'name', a.name,
-        'guests', a.guests,
-        'supplies', (
-          SELECT JSON_AGG(
-            JSON_BUILD_OBJECT(
-              'item', s.item,
-              'quantity', s.quantity
-            )
-          )
-          FROM supplies s
-          WHERE s.id = a.supplies_id
-        )
-      )
-    ),
-    'changelog', e.changelog
-  ) AS event
-FROM events e
-LEFT JOIN attendees a ON e.id = a.event_id
-WHERE e.id = ${id}
-GROUP BY e.id;`;
-
-const RSVP_TO_EVENT = `
-    INSERT INTO attendees (name, event_id, supplies_id, guests)
-    VALUES ($1, $2, NULL, NULL)`
+/**
+ * Deletes an attendee for an event
+ * @param attendeeId 
+ */
+export async function deleteRsvp(attendeeId: string): Promise<void> {
+    await prisma.attendee.delete({
+        where: {
+            id: attendeeId
+        }
+    })
+}
