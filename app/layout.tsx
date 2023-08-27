@@ -1,5 +1,6 @@
 import './globals.css'
 import type { Metadata } from 'next'
+import Navbar from './navbar'
 
 export const metadata: Metadata = {
   title: 'RSVP',
@@ -13,7 +14,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <Navbar />
+        {children}
+      </body>
     </html>
   )
 }

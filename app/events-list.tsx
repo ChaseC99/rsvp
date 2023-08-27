@@ -10,9 +10,9 @@ export default function EventsList({ events }: { events: Event[] }) {
                     <li key={id}>
                         <Link href={`/${encodeURIComponent(id)}`}>
                             {title}
+                            <br />
+                            {date.toDateString()}
                         </Link>
-                        <br />
-                        {date.toDateString()}
                     </li>
                 ))}
             </ul>
