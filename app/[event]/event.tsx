@@ -148,7 +148,11 @@ export default function EventPage({ event }: { event: Event }) {
                 <h3>{date.toDateString()}</h3>
             </div>
 
-            <Button onClick={() => setShowRsvp(true)}>
+            <Button 
+                onClick={() => setShowRsvp(true)}
+                variant="contained"
+                color="success"
+            >
                 RSVP
             </Button>
 
@@ -174,12 +178,13 @@ export default function EventPage({ event }: { event: Event }) {
 const styles = {
     modal: {
         maxHeight: '90vh',
+        maxWidth: '90vw',
+        width: '100%',
         overflowY: 'scroll' as 'scroll',
         position: 'absolute' as 'absolute',
         top: '50%',
         left: '50%',
         transform: 'translate(-50%, -50%)',
-        width: 400,
         bgcolor: 'background.paper',
         borderRadius: '8px',
         boxShadow: 24,
