@@ -1,37 +1,79 @@
 "use client";
-import { Box, Button, Modal } from "@mui/material";
+import { Box, Button, Checkbox, FormControlLabel, Modal, TextField } from "@mui/material";
 import { useRef, useState } from "react"
 import type {
     Attendee,
     Event,
-    Supply,
 } from "../types";
+import LabeledCounterGroup from "../_components/labeled-counter-group";
+import GuestListInput from "../_components/guests-list-input";
+import Collapsable from "../_components/collapsable";
+import { LabeledValue } from "../_components/labeled-counter";
 
 function RsvpModal({ eventId, onClose }: { eventId: string, onClose: () => void }) {
-    const nameRef = useRef<HTMLInputElement>(null);
+    const [name, setName] = useState("");
+    const tbdRef = useRef<HTMLButtonElement>(null); // TODO: implement tdb on backend
+    const [guests, setGuests] = useState<string[]>([""]);
+    const [supplies, setSupplies] = useState<LabeledValue[]>([]);
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const endpoint = '/api/rsvp';
-        const name = nameRef.current?.value;
+
+        const filteredSupplies = supplies.filter(({label, value}) => label !== "" && value > 0).map(({label: item, value: quantity}) => ({item, quantity}));
+        const filteredGuests = guests.filter((guest) => guest !== "");
+        
+        const data = {
+            attendee: {
+                name,
+                eventId,
+                supplies: filteredSupplies,
+                guests: filteredGuests,
+            }
+        }
 
         const options = {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ attendee: { name, eventId } }),
+            body: JSON.stringify(data),
         }
         
-        await fetch(endpoint, options);
+        const resp = await fetch(endpoint, options);
+        // TODO: handle response
+
         onClose();
     }
 
     return (
         <Box sx={styles.modal}>
-            <form onSubmit={handleSubmit} method="post">
-                <input type="text" id="name" ref={nameRef} placeholder="Name" />
-                <button type="submit">RSVP</button>
+            <form onSubmit={handleSubmit} style={styles.form}>
+                <TextField 
+                    id="name" 
+                    label="Name" 
+                    variant="outlined" 
+                    required 
+                    onChange={(event) => setName(event.target.value)}
+                />
+                <FormControlLabel control={<Checkbox ref={tbdRef}/>} label="Tentatively coming" />
+                
+                <Collapsable title="Supplies">
+                    <LabeledCounterGroup labels={supplies} onChange={(supplies) => setSupplies(supplies)}/>
+                </Collapsable>
+
+                <Collapsable title="Guests">
+                    <GuestListInput guests={guests} onChange={(guests) => setGuests(guests)}/>
+                </Collapsable>
+
+                <Button 
+                    type="submit" 
+                    variant="contained" 
+                    disableElevation 
+                    disabled={name === ""}
+                >
+                    RSVP
+                </Button>
             </form>
         </Box>
     )
@@ -131,14 +173,21 @@ export default function EventPage({ event }: { event: Event }) {
 
 const styles = {
     modal: {
+        maxHeight: '90vh',
+        overflowY: 'scroll' as 'scroll',
         position: 'absolute' as 'absolute',
         top: '50%',
         left: '50%',
         transform: 'translate(-50%, -50%)',
         width: 400,
         bgcolor: 'background.paper',
-        border: '2px solid #000',
+        borderRadius: '8px',
         boxShadow: 24,
         p: 4,
+    },
+    form: {
+        display: 'flex',
+        flexDirection: 'column' as 'column',
+        gap: '1rem',
     }
 };
