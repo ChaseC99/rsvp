@@ -11,6 +11,7 @@ import Collapsable from "../_components/collapsable";
 import { LabeledValue } from "../_components/labeled-counter";
 import PublicTwoToneIcon from '@mui/icons-material/PublicTwoTone';
 import CalendarMonthTwoToneIcon from '@mui/icons-material/CalendarMonthTwoTone';
+import { getAttendeeCount } from "../_utils/helpers";
 
 function RsvpModal({ eventId, onClose }: { eventId: string, onClose: () => void }) {
     const [name, setName] = useState("");
@@ -91,13 +92,11 @@ function EventDetail({ icon, text }: { icon: React.ReactNode, text: string }) {
 }
 
 function Attending(attendees: Attendee[]) {
-    const numAttending = attendees.length;
-    const numGuests = attendees.reduce((acc, attendee) => acc + attendee.guests.length, 0);
-    const total = numAttending + numGuests;
+    const numAttending = getAttendeeCount(attendees);
 
     return (
         <div>
-            <Typography variant="h5">Attending · {total}</Typography>
+            <Typography variant="h5">Attending · {numAttending}</Typography>
             <Divider />
             <List>
                 {attendees.map(({ name, guests }) => (
