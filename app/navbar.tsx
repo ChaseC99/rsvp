@@ -1,6 +1,6 @@
 "use client";
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import AppBar from '@mui/material/AppBar';
@@ -17,10 +17,26 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
+import { Event } from './types';
 
 export default function Navbar() {
     const router = useRouter();
     const [menuIsOpen, setMenuIsOpen] = useState(false);
+    const [events, setEvents] = useState<Event[]>([]);
+
+    // Fetch events from API
+    useEffect(() => {
+        fetch('/api/events')
+            .then((response) => response.json())
+            .then((data) => {
+                const events = data.map((event: Event) => ({
+                    ...event,
+                    date: new Date(event.date),
+                }));
+                setEvents(events)}
+            );
+    }, []);
+
     return (
         <>
             <AppBar position="static">
@@ -65,10 +81,23 @@ export default function Navbar() {
                 </List>
                 <Divider />
                 <List>
-                    {['Event 0', 'Event 1', 'Event 2'].map((text, index) => (
-                        <ListItem key={text} disablePadding>
-                                <h2>{text}</h2>
-                        </ListItem>
+                    {events.map((event) => (
+                        <>
+                            <ListItem key={event.id} >
+                                <ListItemButton
+                                    onClick={() => {
+                                        router.push(`/${event.id}`);
+                                        setMenuIsOpen(false);
+                                    }}
+                                >
+                                    <ListItemText 
+                                        primary={event.title} 
+                                        secondary={event.date.toDateString()}
+                                    />
+                                </ListItemButton>
+                            </ListItem>
+                            <Divider variant='middle'/>
+                        </>
                     ))}
                 </List>
             </Drawer>
