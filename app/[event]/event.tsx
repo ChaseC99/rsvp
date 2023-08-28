@@ -1,5 +1,5 @@
 "use client";
-import { Box, Button, Checkbox, FormControlLabel, Modal, TextField } from "@mui/material";
+import { Box, Button, Checkbox, Divider, FormControlLabel, List, ListItem, Modal, TextField, Typography } from "@mui/material";
 import { useRef, useState } from "react"
 import type {
     Attendee,
@@ -9,6 +9,8 @@ import LabeledCounterGroup from "../_components/labeled-counter-group";
 import GuestListInput from "../_components/guests-list-input";
 import Collapsable from "../_components/collapsable";
 import { LabeledValue } from "../_components/labeled-counter";
+import PublicTwoToneIcon from '@mui/icons-material/PublicTwoTone';
+import CalendarMonthTwoToneIcon from '@mui/icons-material/CalendarMonthTwoTone';
 
 function RsvpModal({ eventId, onClose }: { eventId: string, onClose: () => void }) {
     const [name, setName] = useState("");
@@ -20,9 +22,9 @@ function RsvpModal({ eventId, onClose }: { eventId: string, onClose: () => void 
         event.preventDefault();
         const endpoint = '/api/rsvp';
 
-        const filteredSupplies = supplies.filter(({label, value}) => label !== "" && value > 0).map(({label: item, value: quantity}) => ({item, quantity}));
+        const filteredSupplies = supplies.filter(({ label, value }) => label !== "" && value > 0).map(({ label: item, value: quantity }) => ({ item, quantity }));
         const filteredGuests = guests.filter((guest) => guest !== "");
-        
+
         const data = {
             attendee: {
                 name,
@@ -39,7 +41,7 @@ function RsvpModal({ eventId, onClose }: { eventId: string, onClose: () => void 
             },
             body: JSON.stringify(data),
         }
-        
+
         const resp = await fetch(endpoint, options);
         // TODO: handle response
 
@@ -49,27 +51,27 @@ function RsvpModal({ eventId, onClose }: { eventId: string, onClose: () => void 
     return (
         <Box sx={styles.modal}>
             <form onSubmit={handleSubmit} style={styles.form}>
-                <TextField 
-                    id="name" 
-                    label="Name" 
-                    variant="outlined" 
-                    required 
+                <TextField
+                    id="name"
+                    label="Name"
+                    variant="outlined"
+                    required
                     onChange={(event) => setName(event.target.value)}
                 />
-                <FormControlLabel control={<Checkbox ref={tbdRef}/>} label="Tentatively coming" />
-                
+                <FormControlLabel control={<Checkbox ref={tbdRef} />} label="Tentatively coming" />
+
                 <Collapsable title="Supplies">
-                    <LabeledCounterGroup labels={supplies} onChange={(supplies) => setSupplies(supplies)}/>
+                    <LabeledCounterGroup labels={supplies} onChange={(supplies) => setSupplies(supplies)} />
                 </Collapsable>
 
                 <Collapsable title="Guests">
-                    <GuestListInput guests={guests} onChange={(guests) => setGuests(guests)}/>
+                    <GuestListInput guests={guests} onChange={(guests) => setGuests(guests)} />
                 </Collapsable>
 
-                <Button 
-                    type="submit" 
-                    variant="contained" 
-                    disableElevation 
+                <Button
+                    type="submit"
+                    variant="contained"
+                    disableElevation
                     disabled={name === ""}
                 >
                     RSVP
@@ -79,21 +81,33 @@ function RsvpModal({ eventId, onClose }: { eventId: string, onClose: () => void 
     )
 }
 
-function Attending(attendees: Attendee[]) {
+function EventDetail({ icon, text }: { icon: React.ReactNode, text: string }) {
     return (
-        <div>
-            <h2>Attending</h2>
-            <ul>
-                {attendees.map(({ name }) => (
-                    <li key={name}>{name}</li>
-                ))}
-            </ul>
+        <div style={styles.detail}>
+            {icon}
+            <Typography variant="body1">{text}</Typography>
         </div>
     )
 }
 
-function Supplies(attendees: Attendee[]) {
-    const supplies = Object.values(attendees).reduce((acc, attendee) => {
+function Attending(attendees: Attendee[]) {
+    const numAttending = attendees.length;
+
+    return (
+        <div>
+            <Typography variant="h5">Attending · {numAttending}</Typography>
+            <Divider />
+            <List>
+                {attendees.map(({ name }) => (
+                    <ListItem key={name}>{name}</ListItem>
+                ))}
+            </List>
+        </div>
+    )
+}
+
+function getSuppliesFromAttendees(attendees: Attendee[]) {
+    const suppliesMap = Object.values(attendees).reduce((acc, attendee) => {
         if (!attendee.supplies) return acc;
 
         attendee.supplies.forEach((supply) => {
@@ -106,19 +120,24 @@ function Supplies(attendees: Attendee[]) {
         });
         return acc;
     }, {} as Record<string, number>);
+    
+    return Object.entries(suppliesMap);
+};
 
+function Supplies(supplies: [string, number][]) {
     return (
         <div>
-            <h2>Supplies</h2>
-            <ul>
+            <Typography variant="h5">Supplies</Typography>
+            <Divider />
+            <List>
                 {/* Iterate over the supplies */}
-                {Object.entries(supplies).map(([item, quantity]) => (
-                    <li key={item}>
+                {supplies.map(([item, quantity]) => (
+                    <ListItem key={item}>
                         {quantity} {item}
                         {quantity > 1 ? "s" : ""}
-                    </li>
+                    </ListItem>
                 ))}
-            </ul>
+            </List>
         </div>
     )
 }
@@ -126,7 +145,8 @@ function Supplies(attendees: Attendee[]) {
 function Changelog(changes: string[]) {
     return (
         <div>
-            <h2>Changelog</h2>
+            <Typography variant="h5">Changelog</Typography>
+            <Divider />
             <ul>
                 {changes.map((change) => (
                     <li key={change}>{change}</li>
@@ -139,26 +159,40 @@ function Changelog(changes: string[]) {
 export default function EventPage({ event }: { event: Event }) {
     const [showRsvp, setShowRsvp] = useState(false);
     const { title, id, date, description, location, attendees, changelog } = event;
+    const supplies = getSuppliesFromAttendees(attendees);
 
     return (
         <div>
-            <h1>{title}</h1>
-            <div>
-                <h3>{location}</h3>
-                <h3>{date.toDateString()}</h3>
+            <div style={styles.header}>
+                <Typography variant="h2">
+                    {title}
+                </Typography>
             </div>
 
-            <Button 
+            <div style={styles.details}>
+                <EventDetail
+                    icon={<PublicTwoToneIcon />}
+                    text={location}
+                />
+                <EventDetail
+                    icon={<CalendarMonthTwoToneIcon />}
+                    text={date.toDateString()}
+                />
+            </div>
+
+            <Button
                 onClick={() => setShowRsvp(true)}
                 variant="contained"
                 color="success"
+                style={styles.rsvp}
+                size="large"
             >
                 RSVP
             </Button>
 
-            {Attending(attendees)}
-            {Supplies(attendees)}
-            {Changelog(changelog)}
+            {attendees.length > 0 && Attending(attendees)}
+            {supplies.length > 0 && Supplies(supplies)}
+            {changelog.length > 0 && Changelog(changelog)}
 
             <Modal
                 open={showRsvp}
@@ -194,5 +228,20 @@ const styles = {
         display: 'flex',
         flexDirection: 'column' as 'column',
         gap: '1rem',
-    }
+    },
+    header: {
+        marginBottom: '1rem',
+    },
+    details: {
+        margin: '1rem 0',
+    },
+    detail: {
+        display: "flex",
+        alignItems: "center",
+        gap: "8px",
+        margin: '8px 0',
+    },
+    rsvp: {
+        margin: '1rem 0',
+    },
 };
