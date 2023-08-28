@@ -1,5 +1,5 @@
 "use client";
-import { Box, Button, Checkbox, Divider, FormControlLabel, List, ListItem, Modal, TextField, Typography } from "@mui/material";
+import { Box, Button, Checkbox, Divider, FormControlLabel, List, ListItem, ListItemText, Modal, TextField, Typography } from "@mui/material";
 import { useRef, useState } from "react"
 import type {
     Attendee,
@@ -92,14 +92,23 @@ function EventDetail({ icon, text }: { icon: React.ReactNode, text: string }) {
 
 function Attending(attendees: Attendee[]) {
     const numAttending = attendees.length;
+    const numGuests = attendees.reduce((acc, attendee) => acc + attendee.guests.length, 0);
+    const total = numAttending + numGuests;
 
     return (
         <div>
-            <Typography variant="h5">Attending · {numAttending}</Typography>
+            <Typography variant="h5">Attending · {total}</Typography>
             <Divider />
             <List>
-                {attendees.map(({ name }) => (
-                    <ListItem key={name}>{name}</ListItem>
+                {attendees.map(({ name, guests }) => (
+                    <ListItem key={name}>
+                        <ListItemText>
+                            {name} 
+                            {guests.length > 0 &&
+                                <p>Guests: {guests.join(", ")}</p>
+                            }
+                        </ListItemText>
+                    </ListItem>
                 ))}
             </List>
         </div>
@@ -120,7 +129,7 @@ function getSuppliesFromAttendees(attendees: Attendee[]) {
         });
         return acc;
     }, {} as Record<string, number>);
-    
+
     return Object.entries(suppliesMap);
 };
 
@@ -133,8 +142,10 @@ function Supplies(supplies: [string, number][]) {
                 {/* Iterate over the supplies */}
                 {supplies.map(([item, quantity]) => (
                     <ListItem key={item}>
-                        {quantity} {item}
-                        {quantity > 1 ? "s" : ""}
+                        <ListItemText>
+                            {quantity} {item}
+                            {quantity > 1 ? "s" : ""}
+                        </ListItemText>
                     </ListItem>
                 ))}
             </List>
