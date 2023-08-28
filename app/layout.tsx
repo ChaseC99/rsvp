@@ -16,7 +16,9 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Navbar />
-        {children}
+        <div style={{padding: "1.5rem"}}>
+          {children}
+        </div>
       </body>
     </html>
   )

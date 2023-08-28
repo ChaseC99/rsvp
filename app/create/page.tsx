@@ -2,7 +2,8 @@
 
 import { useRef, useState } from "react";
 import { useRouter } from 'next/navigation'
-import { Autocomplete, Button, TextField } from "@mui/material";
+import { Autocomplete, Button, TextField, Typography } from "@mui/material";
+import DatePicker from "../_components/date-picker";
 
 export default function CreateEvent() {
     const router = useRouter();
@@ -42,7 +43,9 @@ export default function CreateEvent() {
 
     return (
         <div>
-            <h1>Create Event</h1>
+            <Typography variant="h1" style={styles.header}>
+                Create Event
+            </Typography>
             <form onSubmit={handleSubmit} style={styles.form}>
                 <TextField
                     id="title"
@@ -53,8 +56,24 @@ export default function CreateEvent() {
                     onChange={(event) => setTitle(event.target.value)}
                 />
 
-                <label htmlFor="date">Date</label>
-                <input type="datetime-local" ref={dateRef} />
+                <DatePicker ref={dateRef} />
+
+                <Autocomplete
+                    id="location"
+                    freeSolo
+                    renderInput={(params) => (
+                        <TextField
+                            {...params}
+                            label="Location"
+                            multiline
+                            inputRef={locationRef}
+                        />
+                    )}
+                    options={[
+                        "Las Palmas Park", "Kevin Morran Park", "Washington Park"
+                    ]}
+                />
+
 
                 <TextField
                     id="description"
@@ -64,26 +83,12 @@ export default function CreateEvent() {
                     inputRef={descriptionRef}
                 />
 
-                <Autocomplete
-                    id="location"
-                    freeSolo
-                    renderInput={(params) => (
-                        <TextField 
-                            {...params} 
-                            label="Location" 
-                            multiline
-                            inputRef={locationRef} 
-                        />
-                    )}
-                    options={[
-                        "Las Palmas Park", "Kevin Morran Park", "Washington Park"
-                    ]}
-                />
-
                 <Button
                     disabled={title === ""}
                     type="submit"
                     variant="contained"
+                    size="large"
+                    style={styles.submitButton}
                 >
                     Create event
                 </Button>
@@ -93,10 +98,16 @@ export default function CreateEvent() {
 }
 
 const styles = {
+    header: {
+        fontSize: "3rem",
+        marginBottom: "2rem",
+    },
     form: {
         display: 'flex',
         flexDirection: 'column' as 'column',
         gap: '1rem',
-        padding: '1rem',
+    },
+    submitButton: {
+        marginTop: "1rem",
     }
 }

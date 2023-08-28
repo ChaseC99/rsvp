@@ -93,6 +93,7 @@ a {
 
 @media (prefers-color-scheme: dark) {
   html {
-    color-scheme: dark;
+    /* Remove dark mode for now, since it breaks the create page */
+    /* color-scheme: dark; */
   }
 }
