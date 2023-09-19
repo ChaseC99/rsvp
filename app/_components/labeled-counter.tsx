@@ -54,7 +54,13 @@ export default function LabeledCounter(props: LabeledCounterProps) {
                 aria-label="Quantity Input" 
                 min={0} 
                 value={props.value} 
-                onChange={(_, value) => props.onChange({label: props.label, value: value as number})}
+                onChange={(e, value) => {
+                    // For some reason, the onChange event triggers the form submit.
+                    // preventDefault here to stop that from happening
+                    e.preventDefault();
+                    
+                    props.onChange({label: props.label, value: value as number})
+                }}
             />
             <TextField 
                 id="name" 
