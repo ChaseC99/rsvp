@@ -1,88 +1,21 @@
 "use client";
-import { Box, Button, Checkbox, Divider, FormControlLabel, List, ListItem, ListItemText, Modal, TextField, Typography } from "@mui/material";
-import { useRef, useState } from "react"
+import { useRouter } from "next/navigation";
+import { Button, Divider, List, ListItem, ListItemText, Modal, Typography } from "@mui/material";
+import { useState } from "react"
 import type {
     Attendee,
     Event,
 } from "../types";
-import LabeledCounterGroup from "../_components/labeled-counter-group";
-import GuestListInput from "../_components/guests-list-input";
-import Collapsable from "../_components/collapsable";
-import { LabeledValue } from "../_components/labeled-counter";
 import PublicTwoToneIcon from '@mui/icons-material/PublicTwoTone';
 import CalendarMonthTwoToneIcon from '@mui/icons-material/CalendarMonthTwoTone';
+import RsvpModal from "./rsvp-modal";
 import { getAttendeeCount } from "../_utils/helpers";
 
-function RsvpModal({ eventId, onClose }: { eventId: string, onClose: () => void }) {
-    const [name, setName] = useState("");
-    const tbdRef = useRef<HTMLButtonElement>(null); // TODO: implement tdb on backend
-    const [guests, setGuests] = useState<string[]>([""]);
-    const [supplies, setSupplies] = useState<LabeledValue[]>([]);
-
-    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        const endpoint = '/api/rsvp';
-
-        const filteredSupplies = supplies.filter(({ label, value }) => label !== "" && value > 0).map(({ label: item, value: quantity }) => ({ item, quantity }));
-        const filteredGuests = guests.filter((guest) => guest !== "");
-
-        const data = {
-            attendee: {
-                name,
-                eventId,
-                supplies: filteredSupplies,
-                guests: filteredGuests,
-            }
-        }
-
-        const options = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-        }
-
-        const resp = await fetch(endpoint, options);
-        // TODO: handle response
-
-        onClose();
-    }
-
-    return (
-        <Box sx={styles.modal}>
-            <form onSubmit={handleSubmit} style={styles.form}>
-                <TextField
-                    id="name"
-                    label="Name"
-                    variant="outlined"
-                    required
-                    onChange={(event) => setName(event.target.value)}
-                />
-                <FormControlLabel control={<Checkbox ref={tbdRef} />} label="Tentatively coming" />
-
-                <Collapsable title="Supplies">
-                    <LabeledCounterGroup labels={supplies} onChange={(supplies) => setSupplies(supplies)} />
-                </Collapsable>
-
-                <Collapsable title="Guests">
-                    <GuestListInput guests={guests} onChange={(guests) => setGuests(guests)} />
-                </Collapsable>
-
-                <Button
-                    type="submit"
-                    variant="contained"
-                    disableElevation
-                    disabled={name === ""}
-                >
-                    RSVP
-                </Button>
-            </form>
-        </Box>
-    )
+type EventDetailProps = {
+    icon: React.ReactNode,
+    text: string,
 }
-
-function EventDetail({ icon, text }: { icon: React.ReactNode, text: string }) {
+function EventDetail({ icon, text }: EventDetailProps) {
     return (
         <div style={styles.detail}>
             {icon}
@@ -91,20 +24,31 @@ function EventDetail({ icon, text }: { icon: React.ReactNode, text: string }) {
     )
 }
 
-function Attending(attendees: Attendee[]) {
+type AttendeeProps = {
+    attendees: Attendee[],
+    onClick: (attendee: Partial<Attendee>) => void,
+}
+function Attendees(props: AttendeeProps) {
+    const { attendees, onClick } = props;
     const numAttending = getAttendeeCount(attendees);
+
+    if (numAttending === 0) return null;
+
+    const handleOnClick = (attendee: Partial<Attendee>) => {
+        onClick(attendee);
+    }
 
     return (
         <div>
             <Typography variant="h5">Attending · {numAttending}</Typography>
             <Divider />
             <List>
-                {attendees.map(({ name, guests }) => (
-                    <ListItem key={name}>
+                {attendees.map((attendee) => (
+                    <ListItem key={attendee.id} onClick={() => handleOnClick(attendee)}>
                         <ListItemText>
-                            {name} 
-                            {guests.length > 0 &&
-                                <p>Guests: {guests.join(", ")}</p>
+                            {attendee.name}
+                            {attendee.guests.length > 0 &&
+                                <p>Guests: {attendee.guests.join(", ")}</p>
                             }
                         </ListItemText>
                     </ListItem>
@@ -132,7 +76,12 @@ function getSuppliesFromAttendees(attendees: Attendee[]) {
     return Object.entries(suppliesMap);
 };
 
-function Supplies(supplies: [string, number][]) {
+type SuppliesProps = {
+    supplies: [string, number][],
+}
+function Supplies({supplies}: SuppliesProps) {
+    if (supplies.length === 0) return null;
+    
     return (
         <div>
             <Typography variant="h5">Supplies</Typography>
@@ -152,7 +101,12 @@ function Supplies(supplies: [string, number][]) {
     )
 }
 
-function Changelog(changes: string[]) {
+type ChangelogProps = {
+    changes: string[],
+}
+function Changelog({changes}: ChangelogProps) {
+    if (changes.length === 0) return null;
+
     return (
         <div>
             <Typography variant="h5">Changelog</Typography>
@@ -166,10 +120,99 @@ function Changelog(changes: string[]) {
     )
 }
 
-export default function EventPage({ event }: { event: Event }) {
+type EventPageProps = {
+    event: Event,
+}
+export default function EventPage({ event }: EventPageProps) {
+    const router = useRouter();
+
     const [showRsvp, setShowRsvp] = useState(false);
+    const [showEditRsvp, setShowEditRsvp] = useState(false);
+    const [rsvpDefaultValues, setRsvpDefaultValues] = useState<Partial<Attendee> | null>(null);
     const { title, id, date, description, location, attendees, changelog } = event;
     const supplies = getSuppliesFromAttendees(attendees);
+
+    const handleCreateRsvp = async (rspv: Partial<Attendee>) => {
+        const { name, guests, supplies } = rspv;
+        const endpoint = '/api/rsvp';
+
+        const data = {
+            attendee: {
+                name,
+                eventId: id,
+                supplies,
+                guests
+            }
+        }
+
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        }
+
+        const resp = await fetch(endpoint, options);
+        // TODO: handle response
+
+        router.refresh();
+
+        return Promise.resolve();
+    }
+
+    const handleUpdateRsvp = async (rspv: Partial<Attendee>) => {
+        const endpoint = '/api/rsvp';
+
+        const data = {
+            attendee: {
+                ...rspv,
+            }
+        }
+
+        const options = {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        }
+
+        const resp = await fetch(endpoint, options);
+        // TODO: handle response
+
+        router.refresh();
+
+        return Promise.resolve();
+    }
+
+    const handleDelete = async (id: string) => {
+        const endpoint = '/api/rsvp';
+
+        const data = {
+            attendeeId: id,
+        }
+
+        const options = {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        }
+
+        const resp = await fetch(endpoint, options);
+        // TODO: handle response
+
+        router.refresh();
+
+        return Promise.resolve();
+    }
+
+    const onAttendeeClick = (attendee: Partial<Attendee>) => {
+        setRsvpDefaultValues(attendee);
+        setShowEditRsvp(true);
+    }
 
     return (
         <div>
@@ -200,9 +243,12 @@ export default function EventPage({ event }: { event: Event }) {
                 RSVP
             </Button>
 
-            {attendees.length > 0 && Attending(attendees)}
-            {supplies.length > 0 && Supplies(supplies)}
-            {changelog.length > 0 && Changelog(changelog)}
+            <Attendees
+                attendees={attendees}
+                onClick={onAttendeeClick}
+            />
+            <Supplies supplies={supplies} />
+            <Changelog changes={changelog} />
 
             <Modal
                 open={showRsvp}
@@ -210,8 +256,22 @@ export default function EventPage({ event }: { event: Event }) {
             >
                 <div>
                     <RsvpModal
-                        eventId={id}
                         onClose={() => setShowRsvp(false)}
+                        onSubmit={handleCreateRsvp}
+                    />
+                </div>
+            </Modal>
+            <Modal
+                open={showEditRsvp}
+                onClose={() => setShowEditRsvp(false)}
+            >
+                <div>
+                    <RsvpModal
+                        isEditing={true}
+                        onClose={() => setShowEditRsvp(false)}
+                        onSubmit={handleUpdateRsvp}
+                        defaultValues={rsvpDefaultValues}
+                        onDelete={handleDelete}
                     />
                 </div>
             </Modal>
@@ -220,25 +280,6 @@ export default function EventPage({ event }: { event: Event }) {
 }
 
 const styles = {
-    modal: {
-        maxHeight: '90vh',
-        maxWidth: '90vw',
-        width: '100%',
-        overflowY: 'scroll' as 'scroll',
-        position: 'absolute' as 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        bgcolor: 'background.paper',
-        borderRadius: '8px',
-        boxShadow: 24,
-        p: 4,
-    },
-    form: {
-        display: 'flex',
-        flexDirection: 'column' as 'column',
-        gap: '1rem',
-    },
     header: {
         marginBottom: '1rem',
     },

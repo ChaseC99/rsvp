@@ -106,6 +106,7 @@ export async function updateRsvp(attendee: Attendee): Promise<void> {
         data: {
             ...attendee,
             supplies: {
+                deleteMany: {},    
                 create: attendee.supplies
             },
         }})

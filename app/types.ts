@@ -4,10 +4,10 @@ import type {
     Supply as PrismaSupply, 
 } from "@prisma/client";
 
-export type Supply = Omit<PrismaSupply, "attendee">;
+export type Supply = Omit<PrismaSupply, "id" | "attendee" | "attendeeId">;
 
 export type Attendee = Omit<PrismaAttendee, "supplies"> & {
-    supplies: PrismaSupply[];
+    supplies: Supply[];
 };
 
 export type Event = Omit<PrismaEvent, "attendees"> & {
