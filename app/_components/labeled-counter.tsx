@@ -1,37 +1,51 @@
 import * as React from 'react';
-import {
-    Unstable_NumberInput as NumberInput,
-    NumberInputProps,
-} from '@mui/base/Unstable_NumberInput';
-import { styled } from '@mui/system';
 import RemoveIcon from '@mui/icons-material/Remove';
 import AddIcon from '@mui/icons-material/Add';
-import { TextField } from '@mui/material';
+import { IconButton, TextField } from '@mui/material';
 
-const CustomNumberInput = React.forwardRef(function CustomNumberInput(
+type NumberInputProps = {
+    value: number,
+    onChange: (value: number) => void,
+}
+const NumberInput = React.forwardRef(function NumberInput(
     props: NumberInputProps,
-    ref: React.ForwardedRef<HTMLDivElement>,
 ) {
+    const increment = () => {
+        if (isNaN(props.value)) {
+            // If the value is NaN, the text field is probably blank
+            // Set the value to 1, as if the text field was 0
+            props.onChange(1);
+        } else {
+            props.onChange(props.value + 1)
+        }
+    }
+
+    const decrement = () => {
+        if (props.value > 0) {
+            // Check to make sure the value is greater than 0
+            // so that it doesn't go negative
+            props.onChange(props.value - 1);
+        }
+    }
+
     return (
-        <NumberInput
-            slots={{
-                root: StyledInputRoot,
-                input: StyledInput,
-                incrementButton: StyledButton,
-                decrementButton: StyledButton,
-            }}
-            slotProps={{
-                incrementButton: {
-                    children: <AddIcon />,
-                    className: 'increment',
-                },
-                decrementButton: {
-                    children: <RemoveIcon />,
-                },
-            }}
-            {...props}
-            ref={ref}
-        />
+        <div style={styles.numberInput}>
+            <IconButton onClick={decrement}>
+                <RemoveIcon />
+            </IconButton>
+            <input
+                type="number"
+                style={styles.input}
+                inputMode="numeric"
+                value={props.value}
+                min={0}
+                onFocus={(e) => e.target.select()}
+                onChange={(e) => props.onChange(parseInt(e.target.value))}
+            />
+            <IconButton onClick={increment}>
+                <AddIcon />
+            </IconButton>
+        </div>
     );
 });
 
@@ -44,137 +58,60 @@ type LabeledCounterProps = {
     label: string;
     value: number;
     placeholderLabel?: string;
-    onChange: ({label, value}: LabeledValue) => void;
+    onChange: ({ label, value }: LabeledValue) => void;
 };
 
 export default function LabeledCounter(props: LabeledCounterProps) {
     return (
-        <div style={{display: "flex", flexDirection: "row", margin: "8px 0"}}>
-            <CustomNumberInput 
-                aria-label="Quantity Input" 
-                min={0} 
-                value={props.value} 
-                onChange={(e, value) => {
-                    // For some reason, the onChange event triggers the form submit.
-                    // preventDefault here to stop that from happening
-                    e.preventDefault();
-                    
-                    props.onChange({label: props.label, value: value as number})
+        <div style={{ display: "flex", flexDirection: "row", margin: "8px 0" }}>
+            <NumberInput
+                onChange={(value: number) => {
+                    props.onChange({ label: props.label, value: value })
                 }}
+                value={props.value}
             />
-            <TextField 
-                id="name" 
-                label="Item" 
-                variant="outlined" 
+            <TextField
+                id="name"
+                label="Item"
+                variant="outlined"
                 placeholder={props.placeholderLabel}
-                value={props.label} 
-                onChange={(event) => props.onChange({label: event.target.value, value: props.value})}
+                value={props.label}
+                onChange={(event) => props.onChange({ label: event.target.value, value: props.value })}
             />
         </div>
     );
 }
 
-const blue = {
-    100: '#daecff',
-    200: '#b6daff',
-    300: '#66b2ff',
-    400: '#3399ff',
-    500: '#007fff',
-    600: '#0072e5',
-    800: '#004c99',
-};
 
-const grey = {
-    50: '#f6f8fa',
-    100: '#eaeef2',
-    200: '#d0d7de',
-    300: '#afb8c1',
-    400: '#8c959f',
-    500: '#6e7781',
-    600: '#57606a',
-    700: '#424a53',
-    800: '#32383f',
-    900: '#24292f',
-};
+const styles = {
+    numberInput: {
+        display: "flex",
+        flexDirection: "row" as "row",
+        alignItems: "center",
+        gap: "4px",
+        marginRight: "8px",
+    },
+    input: {
+        fontSize: "16px",
+        height: "90%",
+        color: "#24292f",
+        background: '#fff',
+        border: "1px solid #d0d7de",
+        borderRadius: 4,
+        margin: "0 4px",
+        padding: "10px 8px",
+        outline: 0,
+        minWidth: 0,
+        width: "3rem",
+        textAlign: "center" as "center",
 
-const StyledInputRoot = styled('div')(
-    ({ theme }) => `
-  font-family: IBM Plex Sans, sans-serif;
-  font-weight: 400;
-  color: ${theme.palette.mode === 'dark' ? grey[300] : grey[500]};
-  
-  display: flex;
-  flex-flow: row nowrap;
-  justify-content: center;
-  align-items: center;
-`,
-);
-
-const StyledInput = styled('input')(
-    ({ theme }) => `
-  font-size: 0.875rem;
-  font-family: inherit;
-  font-weight: 400;
-  line-height: 1.375;
-  color: ${theme.palette.mode === 'dark' ? grey[300] : grey[900]};
-  background: ${theme.palette.mode === 'dark' ? grey[900] : '#fff'};
-  border: 1px solid ${theme.palette.mode === 'dark' ? grey[700] : grey[200]};
-  border-radius: 4px;
-  margin: 0 4px;
-  padding: 10px 12px;
-  outline: 0;
-  min-width: 0;
-  width: 4rem;
-  text-align: center;
-
-  &:hover {
-    border-color: ${blue[400]};
-  }
-
-  &:focus {
-    border-color: ${blue[400]};
-    box-shadow: 0 0 0 3px ${theme.palette.mode === 'dark' ? blue[500] : blue[200]};
-  }
-
-  &:focus-visible {
-    outline: 0;
-  }
-`,
-);
-
-const StyledButton = styled('button')(
-    ({ theme }) => `
-  font-family: IBM Plex Sans, sans-serif;
-  font-size: 0.875rem;
-  box-sizing: border-box;
-  line-height: 1.5;
-  border: 0;
-  border-radius: 999px;
-  color: ${theme.palette.mode === 'dark' ? blue[300] : blue[600]};
-  background: transparent;
-
-  width: 40px;
-  height: 40px;
-  display: flex;
-  flex-flow: row nowrap;
-  justify-content: center;
-  align-items: center;
-
-  transition-property: all;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 120ms;
-
-  &:hover {
-    background: ${theme.palette.mode === 'dark' ? blue[800] : blue[100]};
-    cursor: pointer;
-  }
-
-  &:focus-visible {
-    outline: 0;
-  }
-
-  &.increment {
-    order: 1;
-  }
-`,
-);
+        "&:hover": {
+            borderColor: "#3399ff",
+            color: "red"
+        },
+        "&:focus": {
+            borderColor: "#3399ff",
+            boxShadow: "0 0 0 3px #b6daff",
+        }
+    },
+}

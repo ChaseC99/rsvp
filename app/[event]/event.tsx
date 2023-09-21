@@ -63,7 +63,8 @@ function getSuppliesFromAttendees(attendees: Attendee[]) {
         if (!attendee.supplies) return acc;
 
         attendee.supplies.forEach((supply) => {
-            const { item, quantity } = supply;
+            let { item, quantity } = supply;
+            item = item.toLowerCase();
             if (acc[item]) {
                 acc[item] += 1;
             } else {
