@@ -7,9 +7,7 @@ type NumberInputProps = {
     value: number,
     onChange: (value: number) => void,
 }
-const NumberInput = React.forwardRef(function NumberInput(
-    props: NumberInputProps,
-) {
+function NumberInput(props: NumberInputProps) {
     const increment = () => {
         if (isNaN(props.value)) {
             // If the value is NaN, the text field is probably blank
@@ -47,7 +45,7 @@ const NumberInput = React.forwardRef(function NumberInput(
             </IconButton>
         </div>
     );
-});
+}
 
 export type LabeledValue = {
     label: string;
@@ -63,7 +61,7 @@ type LabeledCounterProps = {
 
 export default function LabeledCounter(props: LabeledCounterProps) {
     return (
-        <div style={{ display: "flex", flexDirection: "row", margin: "8px 0" }}>
+        <div style={styles.labeledCounter}>
             <NumberInput
                 onChange={(value: number) => {
                     props.onChange({ label: props.label, value: value })
@@ -74,6 +72,7 @@ export default function LabeledCounter(props: LabeledCounterProps) {
                 id="name"
                 label="Item"
                 variant="outlined"
+                fullWidth
                 placeholder={props.placeholderLabel}
                 value={props.label}
                 onChange={(event) => props.onChange({ label: event.target.value, value: props.value })}
@@ -84,12 +83,21 @@ export default function LabeledCounter(props: LabeledCounterProps) {
 
 
 const styles = {
+    labeledCounter: {
+        display: "flex",
+        flexDirection: "row" as "row",
+        margin: "10px 0",
+    },
     numberInput: {
         display: "flex",
         flexDirection: "row" as "row",
         alignItems: "center",
         gap: "4px",
         marginRight: "8px",
+
+        // HACK: Get the left decrement button to line up with the "Add a new item" button
+        // while still preserving the extra padding around the button for touch targets
+        marginLeft: "-8px"
     },
     input: {
         fontSize: "16px",

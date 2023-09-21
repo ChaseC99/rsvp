@@ -10,21 +10,23 @@ export default function EventsList({ events }: { events: Event[] }) {
             {events.map(({ title, id, date, location, attendees }) => (
                 <Link key={id} href={`/${id}`}>
                     <Card style={styles.card}>
-                        <div>
+                        <div style={styles.cardHeader}>
                             <Typography variant='h3' style={{ fontSize: "2rem" }}>
                                 {title}
                             </Typography>
+                            <div style={styles.attendeeCount}>
+                                <Typography style={styles.count}>
+                                    {getAttendeeCount(attendees)}
+                                </Typography>
+                                <AccountCircleIcon fontSize="large" />
+                            </div>
+                        </div>
+                        <div>
                             <Typography variant='body1' style={{ display: "flex", gap: "0.5rem" }}>
                                 {date.toDateString()}
                                 <Divider orientation="vertical" flexItem />
                                 {location}
                             </Typography>
-                        </div>
-                        <div style={styles.attendeeCount}>
-                            <Typography style={styles.count}>
-                                {getAttendeeCount(attendees)}
-                            </Typography>
-                            <AccountCircleIcon fontSize="large"/>
                         </div>
                     </Card>
                 </Link>
@@ -43,9 +45,14 @@ const styles = {
     },
     card: {
         padding: "2rem",
+    },
+    cardHeader: {
         display: "flex",
+        flexDirection: "row" as "row",
         justifyContent: "space-between",
         alignItems: "center",
+        gap: "2rem",
+        marginBottom: "1rem",
     },
     attendeeCount: {
         display: "flex",

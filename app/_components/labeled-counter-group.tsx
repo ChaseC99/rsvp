@@ -15,16 +15,18 @@ export default function LabeledCounterGroup({ labels, onChange }: LabeledCounter
     }
 
     return (
-        <div>
-            {labels.map(({ label, value }, index) => (
-                <LabeledCounter
-                    key={index}
-                    label={label}
-                    value={value}
-                    onChange={({ label, value }) => handleChange(index, { label, value })}
-                />
-            )
-            )}
+        <div style={styles.labeledCounterGroup}>
+            <div>
+                {labels.map(({ label, value }, index) => (
+                    <LabeledCounter
+                        key={index}
+                        label={label}
+                        value={value}
+                        onChange={({ label, value }) => handleChange(index, { label, value })}
+                    />
+                )
+                )}
+            </div>
 
             <Button
                 variant="outlined"
@@ -36,4 +38,12 @@ export default function LabeledCounterGroup({ labels, onChange }: LabeledCounter
             </Button>
         </div>
     );
+}
+
+const styles = {
+    labeledCounterGroup: {
+        display: "flex",
+        flexDirection: "column" as "column",
+        gap: "1rem"
+    }
 }

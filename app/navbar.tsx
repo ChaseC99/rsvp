@@ -82,8 +82,8 @@ export default function Navbar() {
                 <Divider />
                 <List>
                     {events.map((event) => (
-                        <>
-                            <ListItem key={event.id} >
+                        <div key={event.id}>
+                            <ListItem>
                                 <ListItemButton
                                     onClick={() => {
                                         router.push(`/${event.id}`);
@@ -96,8 +96,8 @@ export default function Navbar() {
                                     />
                                 </ListItemButton>
                             </ListItem>
-                            <Divider variant='middle'/>
-                        </>
+                            <Divider variant='middle' />
+                        </div>
                     ))}
                 </List>
             </Drawer>

@@ -7,20 +7,28 @@ type GuestListInputProps = {
 }
 
 export default function GuestListInput({ guests, onChange: setGuests }: GuestListInputProps) {
+    // Create a deep copy of the guests array, so that changes aren't made to event page state
+    const guestsList: string[] = [...guests];
+
+    // Add an empty guest input at the end so that the "Add a new guest" input is always visible
+    if (guestsList.length === 0 || guestsList[guestsList.length - 1] !== "") {
+        guestsList.push("");
+    }
+
     return (
         <div>
-            {guests.map((guest, index) => {
-                const isLastGuest = guests.length === index + 1;
+            {guestsList.map((guest, index) => {
+                const isLastGuest = guestsList.length === index + 1;
 
                 return (
                     <div style={{ margin: "8px 0" }} key={index}>
                         <TextField
                             placeholder={isLastGuest ? "Add a new guest" : "Guest"}
                             variant="standard"
-                            fullWidth={isLastGuest}
+                            style={{width: isLastGuest ? "100%" : "calc(100% - 40px)"}}
                             value={guest}
                             onChange={(event) => {
-                                const newGuests = [...guests];
+                                const newGuests = [...guestsList];
                                 newGuests[index] = event.currentTarget.value;
                                 if (isLastGuest) {
                                     newGuests.push("");
@@ -34,7 +42,7 @@ export default function GuestListInput({ guests, onChange: setGuests }: GuestLis
                                 <IconButton
                                     aria-label="Remove"
                                     onClick={() => {
-                                        const newGuests = [...guests];
+                                        const newGuests = [...guestsList];
                                         newGuests.splice(index, 1);
                                         setGuests(newGuests);
                                     }}
