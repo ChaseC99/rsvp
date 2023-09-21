@@ -2,22 +2,24 @@
 
 import { useRef, useState } from "react";
 import { useRouter } from 'next/navigation'
-import { Autocomplete, Button, TextField, Typography } from "@mui/material";
+import { LoadingButton } from "@mui/lab";
+import { Autocomplete, TextField, Typography } from "@mui/material";
 import DatePicker from "../_components/date-picker";
 
 export default function CreateEvent() {
     const router = useRouter();
 
-    const [title, setTitle] = useState("")
-    const dateRef = useRef<HTMLInputElement>(null);
+    const [submitIsLoading, setSubmitIsLoading] = useState(false);
+    const [title, setTitle] = useState("");
+    const [date, setDate] = useState("");
     const descriptionRef = useRef<HTMLTextAreaElement>(null);
     const locationRef = useRef<HTMLInputElement>(null);
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        setSubmitIsLoading(true)
 
         const endpoint = '/api/event';
-        const date = dateRef.current?.value;
         const description = descriptionRef.current?.value;
         const location = locationRef.current?.value;
 
@@ -32,11 +34,11 @@ export default function CreateEvent() {
         const response = await fetch(endpoint, options);
 
         if (response.ok) {
-            // TODO: Navigate to new event id
-            const data = await response.json();
-            console.log(data);
+            const eventId = await response.json();
+            router.push(`/${eventId}`);
         } else {
             alert('Something went wrong');
+            setSubmitIsLoading(false);
         }
     }
 
@@ -56,7 +58,7 @@ export default function CreateEvent() {
                     onChange={(event) => setTitle(event.target.value)}
                 />
 
-                <DatePicker ref={dateRef} />
+                <DatePicker onChange={setDate} />
 
                 <Autocomplete
                     id="location"
@@ -83,15 +85,16 @@ export default function CreateEvent() {
                     inputRef={descriptionRef}
                 />
 
-                <Button
+                <LoadingButton
                     disabled={title === ""}
                     type="submit"
                     variant="contained"
                     size="large"
                     style={styles.submitButton}
+                    loading={submitIsLoading}
                 >
                     Create event
-                </Button>
+                </LoadingButton>
             </form>
         </div>
     )

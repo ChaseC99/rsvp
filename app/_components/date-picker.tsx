@@ -1,10 +1,11 @@
 import CalendarMonthTwoToneIcon from '@mui/icons-material/CalendarMonthTwoTone';
 
 type DatePickerProps = {
-    ref: React.ForwardedRef<HTMLInputElement>;
+    onChange: (date: string) => void;
 }
 
 export default function DatePicker(props: DatePickerProps) {
+    const {onChange} = props;
     return (
         <div style={styles.wrapper}>
             <label htmlFor="date">
@@ -13,8 +14,8 @@ export default function DatePicker(props: DatePickerProps) {
             <input 
                 id="date" 
                 type="datetime-local" 
-                ref={props.ref} 
                 style={styles.dateInput}
+                onChange={(e) => onChange(e.target.value)}
             />
         </div>
     )

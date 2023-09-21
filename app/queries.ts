@@ -12,14 +12,30 @@ const prisma = new PrismaClient()
  * Loads all events
  * @returns a list of all events
  */
-export async function loadEvents(): Promise<Event[]> {
-    const events = await prisma.event.findMany({
-        include: { 
-            attendees: {
-                include: { supplies: true }
+export async function loadEvents(includePastEvents = false): Promise<Event[]> {
+    const events = includePastEvents ?
+        await prisma.event.findMany({
+            include: {
+                attendees: {
+                    include: { supplies: true }
+                }
             }
-         }
-    });
+        })
+        :
+        await prisma.event.findMany({
+            where: {
+                date: {
+                    // All events newer than 24 hours ago
+                    gte: new Date(Date.now() - 86400000)
+                }
+            },
+            include: {
+                attendees: {
+                    include: { supplies: true }
+                }
+            }
+        });
+
     return events;
 }
 
@@ -56,7 +72,7 @@ export async function createEvent(event: Event): Promise<String> {
             ...eventData,
         }
     });
-    
+
     return createdEvent.id;
 };
 
@@ -106,10 +122,11 @@ export async function updateRsvp(attendee: Attendee): Promise<void> {
         data: {
             ...attendee,
             supplies: {
-                deleteMany: {},    
+                deleteMany: {},
                 create: attendee.supplies
             },
-        }})
+        }
+    })
 }
 
 /**
