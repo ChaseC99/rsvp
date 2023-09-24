@@ -1,10 +1,25 @@
+"use client";
+import { useState, useEffect } from 'react';
 import { Divider, Typography } from "@mui/material";
 import EventsList from "./events-list";
-import { loadEvents } from "./queries";
 import DirectionsRunIcon from '@mui/icons-material/DirectionsRun';
+import { Event } from './types';
 
-export default async function Home() {
-    const events = await loadEvents()
+export default function Home() {
+    const [events, setEvents] = useState<Event[]>([]);    
+
+    // Fetch events from API
+    useEffect(() => {
+        fetch('/api/events')
+            .then((response) => response.json())
+            .then((data) => {
+                const events = data.map((event: Event) => ({
+                    ...event,
+                    date: new Date(event.date),
+                }));
+                setEvents(events)}
+            );
+    }, []);
 
     return (
         <div>
