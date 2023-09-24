@@ -1,7 +1,6 @@
-import { createEvent } from "@/app/queries";
+import { createEvent, updateEvent, deleteEvent } from "@/app/queries";
 
 // Create a new event
-// Request body format:
 export async function POST(request: Request): Promise<Response> {
     const {
         id,
@@ -22,4 +21,18 @@ export async function POST(request: Request): Promise<Response> {
     });
     
     return new Response(JSON.stringify(event), { status: 201 });
+}
+
+// Update an existing event
+export async function PUT(request: Request): Promise<Response> {
+    const { event } = await request.json();
+    await updateEvent(event);
+    return new Response(null, { status: 200 });
+}
+
+// Delete an event
+export async function DELETE(request: Request): Promise<Response> {
+    const { eventId } = await request.json();
+    await deleteEvent(eventId);
+    return new Response(null, { status: 204 });
 }

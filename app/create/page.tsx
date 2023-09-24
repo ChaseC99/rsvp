@@ -1,34 +1,21 @@
 "use client";
 
-import { useRef, useState } from "react";
 import { useRouter } from 'next/navigation'
-import { LoadingButton } from "@mui/lab";
-import { Autocomplete, TextField, Typography } from "@mui/material";
-import DatePicker from "../_components/date-picker";
+import { Typography } from "@mui/material";
+import EventForm from "../_components/event-form";
+import { Event } from "../types";
 
 export default function CreateEvent() {
     const router = useRouter();
 
-    const [submitIsLoading, setSubmitIsLoading] = useState(false);
-    const [title, setTitle] = useState("");
-    const [date, setDate] = useState("");
-    const descriptionRef = useRef<HTMLTextAreaElement>(null);
-    const locationRef = useRef<HTMLInputElement>(null);
-
-    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        setSubmitIsLoading(true)
-
+    const handleSubmit = async (event: Partial<Event>) => {
         const endpoint = '/api/event';
-        const description = descriptionRef.current?.value;
-        const location = locationRef.current?.value;
-
         const options = {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ title, date, description, location }),
+            body: JSON.stringify({ ...event }),
         }
 
         const response = await fetch(endpoint, options);
@@ -38,8 +25,9 @@ export default function CreateEvent() {
             router.push(`/${eventId}`);
         } else {
             alert('Something went wrong');
-            setSubmitIsLoading(false);
         }
+
+        return Promise.resolve();
     }
 
 
@@ -48,54 +36,7 @@ export default function CreateEvent() {
             <Typography variant="h1" style={styles.header}>
                 Create Event
             </Typography>
-            <form onSubmit={handleSubmit} style={styles.form}>
-                <TextField
-                    id="title"
-                    label="Title"
-                    variant="outlined"
-                    required
-                    value={title}
-                    onChange={(event) => setTitle(event.target.value)}
-                />
-
-                <DatePicker onChange={setDate} />
-
-                <Autocomplete
-                    id="location"
-                    freeSolo
-                    renderInput={(params) => (
-                        <TextField
-                            {...params}
-                            label="Location"
-                            multiline
-                            inputRef={locationRef}
-                        />
-                    )}
-                    options={[
-                        "Las Palmas Park", "Kevin Morran Park", "Washington Park"
-                    ]}
-                />
-
-
-                <TextField
-                    id="description"
-                    label="Description"
-                    variant="outlined"
-                    multiline
-                    inputRef={descriptionRef}
-                />
-
-                <LoadingButton
-                    disabled={title === ""}
-                    type="submit"
-                    variant="contained"
-                    size="large"
-                    style={styles.submitButton}
-                    loading={submitIsLoading}
-                >
-                    Create event
-                </LoadingButton>
-            </form>
+            <EventForm onSubmit={handleSubmit} />
         </div>
     )
 }

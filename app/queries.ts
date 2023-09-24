@@ -3,6 +3,7 @@
 // that the client side component can call instead
 import { PrismaClient } from '@prisma/client'
 import type { Event, Attendee } from './types';
+import { ONE_DAY } from './_utils/constants';
 
 // Initial Prisma client 
 const prisma = new PrismaClient()
@@ -26,7 +27,7 @@ export async function loadEvents(includePastEvents = false): Promise<Event[]> {
             where: {
                 date: {
                     // All events newer than 24 hours ago
-                    gte: new Date(Date.now() - 86400000)
+                    gte: new Date(Date.now() - ONE_DAY)
                 }
             },
             include: {
@@ -81,7 +82,17 @@ export async function createEvent(event: Event): Promise<String> {
  * @param event 
  */
 export async function updateEvent(event: Event): Promise<void> {
-    // TODO
+    // Attendees are updated separately, so it's fine to remove them from the event data
+    const { attendees, ...eventData } = event;
+
+    await prisma.event.update({
+        where: {
+            id: eventData.id
+        },
+        data: {
+            ...eventData,
+        }
+    })
 };
 
 /**
@@ -89,7 +100,11 @@ export async function updateEvent(event: Event): Promise<void> {
  * @param eventId 
  */
 export async function deleteEvent(eventId: string): Promise<void> {
-    // TODO
+    await prisma.event.delete({
+        where: {
+            id: eventId
+        }
+    })
 };
 
 // RSVP QUERIES
