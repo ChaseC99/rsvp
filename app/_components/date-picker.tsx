@@ -6,12 +6,16 @@ import { ONE_DAY } from '../_utils/constants';
 
 type DatePickerProps = {
     onChange: (date: string) => void;
+    defaultValue?: Date;
 }
 
 export default function DatePicker(props: DatePickerProps) {
+    const { onChange, defaultValue } = props;
+    const defaultDate = defaultValue?.toISOString().slice(0, 10) || "";
+    const defaultTime = defaultValue?.toISOString().slice(11, 16) || "";
+    
     const dateRef = useRef<HTMLInputElement>(null);
     const timeRef = useRef<HTMLInputElement>(null);
-    const { onChange } = props;
 
     const handleChange = () => {
         const date = dateRef.current?.value;
@@ -27,8 +31,8 @@ export default function DatePicker(props: DatePickerProps) {
     }
 
     return (
-        <div style={styles.wrapper}>
-            <div style={styles.input}>
+        <div style={styles.datePicker}>
+            <div style={styles.inputWrapper}>
                 <label htmlFor="date">
                     <CalendarMonthTwoToneIcon fontSize='large' />
                 </label>
@@ -38,7 +42,7 @@ export default function DatePicker(props: DatePickerProps) {
                     ref={dateRef}
                     style={styles.dateInput}
                     onChange={handleChange}
-                    width="100%"
+                    defaultValue={defaultDate}
 
                     // Min date is today minus one day
                     // ISO string is sliced into YYYY-MM-DD format
@@ -46,7 +50,7 @@ export default function DatePicker(props: DatePickerProps) {
                 />
             </div>
 
-            <div style={styles.input}>
+            <div style={styles.inputWrapper}>
                 <label htmlFor="time">
                     <ScheduleIcon fontSize='large' />
                 </label>
@@ -56,6 +60,7 @@ export default function DatePicker(props: DatePickerProps) {
                     ref={timeRef}
                     style={styles.dateInput}
                     onChange={handleChange}
+                    defaultValue={defaultTime}
                 />
             </div>
         </div>
@@ -63,7 +68,7 @@ export default function DatePicker(props: DatePickerProps) {
 }
 
 const styles = {
-    wrapper: {
+    datePicker: {
         padding: "1rem, 0.75rem",
         display: "flex",
         alignItems: "center",
@@ -72,12 +77,13 @@ const styles = {
         flexWrap: "wrap" as "wrap",
         gap: "0.75rem",
     },
-    input: {
+    inputWrapper: {
         display: "flex",
         alignItems: "center",
         gap: "0.75rem",
     },
     dateInput: {
         fontSize: "1rem",
+        padding: 4,
     }
 }

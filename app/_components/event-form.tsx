@@ -2,17 +2,18 @@
 
 import { useRef, useState } from "react";
 import { LoadingButton } from "@mui/lab";
-import { Autocomplete, TextField, Typography } from "@mui/material";
+import { Autocomplete, TextField } from "@mui/material";
 import DatePicker from "../_components/date-picker";
 import { Event } from "../types";
 
 
 type EventFormProps = {
+    submitButtonText: string,
     onSubmit: (event: Partial<Event>) => Promise<void>,
     event?: Event,
 };
 export default function EventForm(props: EventFormProps) {
-    const { event, onSubmit } = props;
+    const { event, submitButtonText, onSubmit } = props;
 
     const [submitIsLoading, setSubmitIsLoading] = useState(false);
     const [title, setTitle] = useState(event?.title || "");
@@ -51,7 +52,7 @@ export default function EventForm(props: EventFormProps) {
                 onChange={(event) => setTitle(event.target.value)}
             />
 
-            <DatePicker onChange={setDate} />
+            <DatePicker onChange={setDate} defaultValue={event?.date} />
 
             <Autocomplete
                 id="location"
@@ -62,12 +63,12 @@ export default function EventForm(props: EventFormProps) {
                         label="Location"
                         multiline
                         inputRef={locationRef}
-                        defaultValue={event?.location}
                     />
                 )}
                 options={[
                     "Las Palmas Park", "Kevin Morran Park", "Washington Park"
                 ]}
+                defaultValue={event?.location}
             />
 
 
@@ -88,7 +89,7 @@ export default function EventForm(props: EventFormProps) {
                 style={styles.submitButton}
                 loading={submitIsLoading}
             >
-                Create event
+                {submitButtonText}
             </LoadingButton>
         </form>
     )

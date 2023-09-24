@@ -25,7 +25,7 @@ type RSVPModalProps = {
     onDelete?: (id: string) => void,
 }
 
-export default function RsvpModal(props: RSVPModalProps) {
+export default function RsvpForm(props: RSVPModalProps) {
     const { onSubmit, onDelete, onClose, defaultValues, isEditing = false } = props;
     const { id, name: initialName, guests: initialGuests, supplies: initialSupplies } = defaultValues || {};
 
@@ -47,7 +47,7 @@ export default function RsvpModal(props: RSVPModalProps) {
 
         const filteredGuests = guests.filter((guest) => guest !== "");
         const filteredSupplies = supplies.filter(({ label, value }) => label !== "" && value > 0)
-            .map(({ label: item, value: quantity }) => ({item, quantity }));
+            .map(({ label: item, value: quantity }) => ({ item, quantity }));
 
         await onSubmit({ id, name, guests: filteredGuests, supplies: filteredSupplies });
 
@@ -57,7 +57,7 @@ export default function RsvpModal(props: RSVPModalProps) {
 
     const handleDelete = async () => {
         if (!onDelete || !id) return;
-        
+
         setSubmitIsLoading(true);
         await onDelete(id);
         setSubmitIsLoading(false);
@@ -65,69 +65,53 @@ export default function RsvpModal(props: RSVPModalProps) {
     }
 
     return (
-        <Box sx={styles.modal}>
-            <form onSubmit={handleSubmit} style={styles.form}>
-                <TextField
-                    id="name"
-                    label="Name"
-                    variant="outlined"
-                    required
-                    value={name}
-                    onChange={(event) => setName(event.target.value)}
-                />
-                <FormControlLabel control={<Checkbox ref={tbdRef} />} label="Tentatively coming" />
+        <form onSubmit={handleSubmit} style={styles.form}>
+            <TextField
+                id="name"
+                label="Name"
+                variant="outlined"
+                required
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+            />
+            <FormControlLabel control={<Checkbox ref={tbdRef} />} label="Tentatively coming" />
 
-                <Collapsable title="Supplies">
-                    <LabeledCounterGroup labels={supplies} onChange={(supplies) => setSupplies(supplies)} />
-                </Collapsable>
+            <Collapsable title="Supplies">
+                <LabeledCounterGroup labels={supplies} onChange={(supplies) => setSupplies(supplies)} />
+            </Collapsable>
 
-                <Collapsable title="Guests">
-                    <GuestListInput guests={guests} onChange={(guests) => setGuests(guests)} />
-                </Collapsable>
+            <Collapsable title="Guests">
+                <GuestListInput guests={guests} onChange={(guests) => setGuests(guests)} />
+            </Collapsable>
 
-                <LoadingButton
-                    type="submit"
-                    variant="contained"
-                    disableElevation
-                    disabled={name === ""}
-                    loading={submitIsLoading}
-                >
-                    {isEditing ? "Update RSVP" : "RSVP"}
-                </LoadingButton>
+            <LoadingButton
+                type="submit"
+                variant="contained"
+                disableElevation
+                disabled={name === ""}
+                loading={submitIsLoading}
+            >
+                {isEditing ? "Update RSVP" : "RSVP"}
+            </LoadingButton>
 
-                {
-                    isEditing && (
-                        <LoadingButton
-                            variant="contained"
-                            color="error"
-                            disableElevation
-                            onClick={handleDelete}
-                            loading={submitIsLoading}
-                        >
-                            Delete
-                        </LoadingButton>
-                    )
-                }
-            </form>
-        </Box>
+            {
+                isEditing && (
+                    <LoadingButton
+                        variant="contained"
+                        color="error"
+                        disableElevation
+                        onClick={handleDelete}
+                        loading={submitIsLoading}
+                    >
+                        Delete
+                    </LoadingButton>
+                )
+            }
+        </form>
     )
 }
 
-const styles = {
-    modal: {
-        maxHeight: '90vh',
-        maxWidth: '90vw',
-        width: '100%',
-        overflowY: 'scroll' as 'scroll',
-        position: 'absolute' as 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        bgcolor: 'background.paper',
-        borderRadius: '8px',
-        boxShadow: 24,
-        p: 4,
-    },
+const styles = {    
     form: {
         display: 'flex',
         flexDirection: 'column' as 'column',

@@ -8,8 +8,12 @@ import type {
 } from "../types";
 import PublicTwoToneIcon from '@mui/icons-material/PublicTwoTone';
 import CalendarMonthTwoToneIcon from '@mui/icons-material/CalendarMonthTwoTone';
-import RsvpModal from "./rsvp-modal";
+
+import RsvpForm from "./rsvp-form";
 import { getAttendeeCount } from "../_utils/helpers";
+import EventForm from "../_components/event-form";
+import ModalContent from "../_components/modal-content";
+import EventMenu from "./event-menu";
 
 type EventDetailProps = {
     icon: React.ReactNode,
@@ -80,9 +84,9 @@ function getSuppliesFromAttendees(attendees: Attendee[]) {
 type SuppliesProps = {
     supplies: [string, number][],
 }
-function Supplies({supplies}: SuppliesProps) {
+function Supplies({ supplies }: SuppliesProps) {
     if (supplies.length === 0) return null;
-    
+
     return (
         <div>
             <Typography variant="h5">Supplies</Typography>
@@ -105,7 +109,7 @@ function Supplies({supplies}: SuppliesProps) {
 type ChangelogProps = {
     changes: string[],
 }
-function Changelog({changes}: ChangelogProps) {
+function Changelog({ changes }: ChangelogProps) {
     if (changes.length === 0) return null;
 
     return (
@@ -121,6 +125,8 @@ function Changelog({changes}: ChangelogProps) {
     )
 }
 
+
+
 type EventPageProps = {
     event: Event,
 }
@@ -129,9 +135,18 @@ export default function EventPage({ event }: EventPageProps) {
 
     const [showRsvp, setShowRsvp] = useState(false);
     const [showEditRsvp, setShowEditRsvp] = useState(false);
+    const [showEditEvent, setShowEditEvent] = useState(false);
     const [rsvpDefaultValues, setRsvpDefaultValues] = useState<Partial<Attendee> | null>(null);
     const { title, id, date, description, location, attendees, changelog } = event;
     const supplies = getSuppliesFromAttendees(attendees);
+
+    const handleEditEvent = () => {
+        setShowEditEvent(true);
+    }
+
+    const handleDeleteEvent = async () => {
+        return Promise.resolve();
+    }
 
     const handleCreateRsvp = async (rspv: Partial<Attendee>) => {
         const { name, guests, supplies } = rspv;
@@ -187,7 +202,7 @@ export default function EventPage({ event }: EventPageProps) {
         return Promise.resolve();
     }
 
-    const handleDelete = async (id: string) => {
+    const handleDeleteRsvp = async (id: string) => {
         const endpoint = '/api/rsvp';
 
         const data = {
@@ -232,17 +247,25 @@ export default function EventPage({ event }: EventPageProps) {
                     icon={<CalendarMonthTwoToneIcon />}
                     text={date.toDateString()}
                 />
+
+                <Typography variant="body1">{description}</Typography>
             </div>
 
-            <Button
-                onClick={() => setShowRsvp(true)}
-                variant="contained"
-                color="success"
-                style={styles.rsvp}
-                size="large"
-            >
-                RSVP
-            </Button>
+            <div style={styles.buttonRow}>
+                <Button
+                    onClick={() => setShowRsvp(true)}
+                    variant="contained"
+                    color="success"
+                    size="large"
+                >
+                    RSVP
+                </Button>
+
+                <EventMenu
+                    onEdit={handleEditEvent}
+                    onDelete={handleDeleteEvent}
+                />
+            </div>
 
             <Attendees
                 attendees={attendees}
@@ -255,26 +278,38 @@ export default function EventPage({ event }: EventPageProps) {
                 open={showRsvp}
                 onClose={() => setShowRsvp(false)}
             >
-                <div>
-                    <RsvpModal
+                <ModalContent>
+                    <RsvpForm
                         onClose={() => setShowRsvp(false)}
                         onSubmit={handleCreateRsvp}
                     />
-                </div>
+                </ModalContent>
             </Modal>
             <Modal
                 open={showEditRsvp}
                 onClose={() => setShowEditRsvp(false)}
             >
-                <div>
-                    <RsvpModal
+                <ModalContent>
+                    <RsvpForm
                         isEditing={true}
                         onClose={() => setShowEditRsvp(false)}
                         onSubmit={handleUpdateRsvp}
                         defaultValues={rsvpDefaultValues}
-                        onDelete={handleDelete}
+                        onDelete={handleDeleteRsvp}
                     />
-                </div>
+                </ModalContent>
+            </Modal>
+            <Modal
+                open={showEditEvent}
+                onClose={() => setShowEditEvent(false)}
+            >
+                <ModalContent>
+                    <EventForm
+                        event={event}
+                        submitButtonText="Update Event"
+                        onSubmit={() => Promise.resolve()}
+                    />
+                </ModalContent>
             </Modal>
         </div>
     )
@@ -293,7 +328,10 @@ const styles = {
         gap: "8px",
         margin: '8px 0',
     },
-    rsvp: {
-        margin: '1rem 0',
+    buttonRow: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        margin: '2rem 0',
     },
 };

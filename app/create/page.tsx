@@ -36,7 +36,7 @@ export default function CreateEvent() {
             <Typography variant="h1" style={styles.header}>
                 Create Event
             </Typography>
-            <EventForm onSubmit={handleSubmit} />
+            <EventForm onSubmit={handleSubmit} submitButtonText='Create event' />
         </div>
     )
 }
