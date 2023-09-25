@@ -4,9 +4,11 @@ import { Divider, Typography } from "@mui/material";
 import EventsList from "./events-list";
 import DirectionsRunIcon from '@mui/icons-material/DirectionsRun';
 import { Event } from './types';
+import Spinner from './_components/spinner';
 
 export default function Home() {
-    const [events, setEvents] = useState<Event[]>([]);    
+    const [events, setEvents] = useState<Event[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
 
     // Fetch events from API
     useEffect(() => {
@@ -17,8 +19,9 @@ export default function Home() {
                     ...event,
                     date: new Date(event.date),
                 }));
-                setEvents(events)}
-            );
+                setEvents(events)
+                setIsLoading(false);
+            });
     }, []);
 
     return (
@@ -30,7 +33,12 @@ export default function Home() {
                 <DirectionsRunIcon />
             </div>
             <Divider />
-            <EventsList events={events} />
+
+            {isLoading ? 
+                <Spinner /> :
+                <EventsList events={events} />
+            }
+
         </div>
     )
 }

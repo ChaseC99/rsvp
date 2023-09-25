@@ -37,6 +37,9 @@ export async function loadEvents(includePastEvents = false): Promise<Event[]> {
             }
         });
 
+    // Sort events by date
+    events.sort((a, b) => a.date.getTime() - b.date.getTime());
+
     return events;
 }
 

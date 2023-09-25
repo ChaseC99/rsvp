@@ -49,7 +49,7 @@ export default function EventMenu(props: EventMenuProps) {
             >
                 <MenuItem onClick={handleEditClick}>Edit Event</MenuItem>
                 <Divider />
-                <MenuItem onClick={handleDeleteClick}>Cancel Event</MenuItem>
+                <MenuItem onClick={handleDeleteClick}>Delete Event</MenuItem>
             </Menu>
         </div>
     );

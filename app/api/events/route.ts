@@ -5,3 +5,5 @@ export async function GET(request: Request): Promise<Response> {
 
     return new Response(JSON.stringify(events), { status: 200 });
 }
+
+export const dynamic = 'force-dynamic';
