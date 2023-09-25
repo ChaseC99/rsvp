@@ -25,7 +25,7 @@ export async function POST(request: Request): Promise<Response> {
 
 // Update an existing event
 export async function PUT(request: Request): Promise<Response> {
-    const { event } = await request.json();
+    const event = await request.json();
     await updateEvent(event);
     return new Response(null, { status: 200 });
 }

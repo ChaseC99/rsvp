@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { Button, Divider, List, ListItem, ListItemText, Modal, Typography } from "@mui/material";
-import { useState } from "react"
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, List, ListItem, ListItemText, Modal, TextField, Typography } from "@mui/material";
+import { useRef, useState } from "react"
 import type {
     Attendee,
     Event,
@@ -136,15 +136,65 @@ export default function EventPage({ event }: EventPageProps) {
     const [showRsvp, setShowRsvp] = useState(false);
     const [showEditRsvp, setShowEditRsvp] = useState(false);
     const [showEditEvent, setShowEditEvent] = useState(false);
+    const [showDeleteEvent, setShowDeleteEvent] = useState(false);
     const [rsvpDefaultValues, setRsvpDefaultValues] = useState<Partial<Attendee> | null>(null);
+    const deleteEventPasswordRef = useRef<HTMLInputElement>(null);
     const { title, id, date, description, location, attendees, changelog } = event;
     const supplies = getSuppliesFromAttendees(attendees);
 
-    const handleEditEvent = () => {
-        setShowEditEvent(true);
+    const handleEditEvent = async (event: Partial<Event>) => {
+        const endpoint = `/api/event`;
+
+        const data = {
+            ...event,
+            id,
+        }
+
+        const options = {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ ...data }),
+        }
+
+        const resp = await fetch(endpoint, options);
+        // TODO: handle response
+
+        router.refresh();
+
+        return Promise.resolve();
     }
 
     const handleDeleteEvent = async () => {
+        // I know, super secure right?
+        // Maybe we'll do real auth later but for now this is 
+        // mainly to prevent accidental deletion.
+        const password = deleteEventPasswordRef.current?.value;
+        if (password !== 'passwort') {
+            alert('Incorrect password');
+            return Promise.resolve();
+        }
+
+        const endpoint = `/api/event`;
+
+        const data = {
+            eventId: id,
+        }
+
+        const options = {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        }
+
+        const resp = await fetch(endpoint, options);
+        // TODO: handle response
+
+        router.push('/');
+
         return Promise.resolve();
     }
 
@@ -262,8 +312,8 @@ export default function EventPage({ event }: EventPageProps) {
                 </Button>
 
                 <EventMenu
-                    onEdit={handleEditEvent}
-                    onDelete={handleDeleteEvent}
+                    onEdit={() => setShowEditEvent(true)}
+                    onDelete={() => setShowDeleteEvent(true)}
                 />
             </div>
 
@@ -274,6 +324,10 @@ export default function EventPage({ event }: EventPageProps) {
             <Supplies supplies={supplies} />
             <Changelog changes={changelog} />
 
+            {/* POPUPS
+            The following are modals and dialogs that are normally hidden
+            but may be shown depending on user interaction 
+            */}
             <Modal
                 open={showRsvp}
                 onClose={() => setShowRsvp(false)}
@@ -307,10 +361,43 @@ export default function EventPage({ event }: EventPageProps) {
                     <EventForm
                         event={event}
                         submitButtonText="Update Event"
-                        onSubmit={() => Promise.resolve()}
+                        onSubmit={handleEditEvent}
+                        onClose={() => setShowEditEvent(false)}
                     />
                 </ModalContent>
             </Modal>
+            <Dialog 
+                open={showDeleteEvent} 
+                onClose={() => setShowDeleteEvent(false)}
+                fullWidth
+            >
+                <DialogTitle>Delete Event</DialogTitle>
+                <DialogContent>
+                    <TextField
+                        inputRef={deleteEventPasswordRef}
+                        autoFocus
+                        label="Password"
+                        fullWidth
+                        variant="standard"
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button 
+                        onClick={() => setShowDeleteEvent(false)}
+                    >
+                        Cancel
+                    </Button>
+                    <Button 
+                        onClick={async () => {
+                            await handleDeleteEvent()
+                            setShowDeleteEvent(false)
+                        }}
+                        color='error'
+                    >
+                        Delete
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </div>
     )
 }
