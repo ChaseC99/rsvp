@@ -1,3 +1,4 @@
+"use client";
 import Link from "next/link";
 import { Card, Divider, Typography } from "@mui/material";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
