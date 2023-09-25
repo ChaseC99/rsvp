@@ -1,3 +1,7 @@
+// Temporarily disabling loading page by renaming it to _loading.tsx
+// because a bug in Next.js causes Suspense to throw a hydration error
+// Rename to loading.tsx when the bug is fixed
+
 import { Divider, Skeleton } from "@mui/material";
 
 export default function LoadingEvent() {
