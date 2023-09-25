@@ -10,11 +10,10 @@ import { Event } from "../types";
 type EventFormProps = {
     submitButtonText: string,
     onSubmit: (event: Partial<Event>) => Promise<void>,
-    onClose: () => void,
     event?: Event,
 };
 export default function EventForm(props: EventFormProps) {
-    const { event, submitButtonText, onSubmit, onClose } = props;
+    const { event, submitButtonText, onSubmit } = props;
 
     const [submitIsLoading, setSubmitIsLoading] = useState(false);
     const [title, setTitle] = useState(event?.title || "");
@@ -39,7 +38,6 @@ export default function EventForm(props: EventFormProps) {
         await onSubmit(event);
 
         setSubmitIsLoading(false);
-        onClose();
     };
 
 

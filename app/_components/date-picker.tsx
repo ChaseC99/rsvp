@@ -11,8 +11,11 @@ type DatePickerProps = {
 
 export default function DatePicker(props: DatePickerProps) {
     const { onChange, defaultValue } = props;
-    const defaultDate = defaultValue?.toISOString().slice(0, 10) || "";
-    const defaultTime = defaultValue?.toISOString().slice(11, 16) || "";
+    const defaultDate = defaultValue?.toLocaleDateString("fr-CA") || "";    // HACK: Using fr-CA to get YYYY-MM-DD format in local time
+    let defaultTime = defaultValue?.toTimeString().slice(0, 5) || "";       // Slicing to get HH:MM format
+    if (defaultTime === "00:00") {
+        defaultTime = "";
+    }
     
     const dateRef = useRef<HTMLInputElement>(null);
     const timeRef = useRef<HTMLInputElement>(null);

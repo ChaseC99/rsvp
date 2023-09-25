@@ -8,6 +8,7 @@ import type {
 } from "../types";
 import PublicTwoToneIcon from '@mui/icons-material/PublicTwoTone';
 import CalendarMonthTwoToneIcon from '@mui/icons-material/CalendarMonthTwoTone';
+import ScheduleIcon from '@mui/icons-material/Schedule';
 
 import RsvpForm from "./rsvp-form";
 import { getAttendeeCount } from "../_utils/helpers";
@@ -162,6 +163,7 @@ export default function EventPage({ event }: EventPageProps) {
         // TODO: handle response
 
         router.refresh();
+        setShowEditEvent(false)
 
         return Promise.resolve();
     }
@@ -297,7 +299,15 @@ export default function EventPage({ event }: EventPageProps) {
                     icon={<CalendarMonthTwoToneIcon />}
                     text={date.toDateString()}
                 />
-
+                <EventDetail
+                    icon={<ScheduleIcon />}
+                    text={
+                        date.toLocaleTimeString([], {
+                            hour: 'numeric',
+                            minute: '2-digit',
+                        })
+                    }
+                />
                 <Typography variant="body1">{description}</Typography>
             </div>
 
@@ -362,7 +372,6 @@ export default function EventPage({ event }: EventPageProps) {
                         event={event}
                         submitButtonText="Update Event"
                         onSubmit={handleEditEvent}
-                        onClose={() => setShowEditEvent(false)}
                     />
                 </ModalContent>
             </Modal>

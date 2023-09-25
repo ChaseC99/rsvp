@@ -10,9 +10,11 @@ datasource db {
 model Event {
   id          String     @id @unique @default(uuid())
   title       String
-  date        DateTime   @db.Date
+  date        DateTime
   description String
   location    String
+  cancelled   Boolean   @default(false)
+  type        String?
   changelog   String[]
   attendees   Attendee[]
 }
