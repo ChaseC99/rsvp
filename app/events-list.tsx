@@ -24,8 +24,11 @@ export default function EventsList({ events }: { events: Event[] }) {
                         </div>
                         <div>
                             <Typography variant='body1' style={{ display: "flex", gap: "0.5rem" }}>
-                                {date.toDateString()}
+                                {date.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
                                 <Divider orientation="vertical" flexItem />
+                                {date.toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })}
+                            </Typography>
+                            <Typography variant='body1'>
                                 {location}
                             </Typography>
                         </div>

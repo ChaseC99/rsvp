@@ -33,7 +33,8 @@ export default function Navbar() {
                     ...event,
                     date: new Date(event.date),
                 }));
-                setEvents(events)}
+                setEvents(events)
+            }
             );
     }, []);
 
@@ -42,6 +43,7 @@ export default function Navbar() {
             <AppBar position="static">
                 <Toolbar>
                     <IconButton
+                        id="menu-button"
                         size="large"
                         edge="start"
                         color="inherit"
@@ -52,7 +54,9 @@ export default function Navbar() {
                         <MenuIcon />
                     </IconButton>
                     <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                        RSVP
+                        <label htmlFor="menu-button">
+                            RSVP
+                        </label>
                     </Typography>
                     <Link href="create">
                         <AddCircleOutlineIcon />
@@ -90,8 +94,8 @@ export default function Navbar() {
                                         setMenuIsOpen(false);
                                     }}
                                 >
-                                    <ListItemText 
-                                        primary={event.title} 
+                                    <ListItemText
+                                        primary={event.title}
                                         secondary={event.date.toDateString()}
                                     />
                                 </ListItemButton>

@@ -33,7 +33,8 @@ export default function RsvpForm(props: RSVPModalProps) {
     const [name, setName] = useState(initialName || "");
     const [guests, setGuests] = useState<string[]>(initialGuests || [""]);
     const [supplies, setSupplies] = useState<LabeledValue[]>(
-        initialSupplies?.map(supply => ({ label: supply.item, value: supply.quantity })) || []
+        initialSupplies?.map(supply => ({ label: supply.item, value: supply.quantity })) || 
+        [{label: "Ball", value: 0}, {label: "Net", value: 0}] as LabeledValue[]
     );
     // TODO: implement tdb on backend
     const tbdRef = useRef<HTMLButtonElement>(null);
@@ -74,7 +75,7 @@ export default function RsvpForm(props: RSVPModalProps) {
                 value={name}
                 onChange={(event) => setName(event.target.value)}
             />
-            <FormControlLabel control={<Checkbox ref={tbdRef} />} label="Tentatively coming" />
+            {/* <FormControlLabel control={<Checkbox ref={tbdRef} />} label="Tentatively coming" /> */}
 
             <Collapsable title="Supplies">
                 <LabeledCounterGroup labels={supplies} onChange={(supplies) => setSupplies(supplies)} />

@@ -55,7 +55,10 @@ export async function loadEvent(id: string): Promise<Event | null> {
         },
         include: {
             attendees: {
-                include: { supplies: true }
+                include: { supplies: true },
+                orderBy: {
+                    createdAt: 'asc'
+                }
             }
         }
     });

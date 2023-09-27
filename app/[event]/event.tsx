@@ -308,7 +308,7 @@ export default function EventPage({ event }: EventPageProps) {
                         })
                     }
                 />
-                <Typography variant="body1">{description}</Typography>
+                <Typography variant="body1" style={{whiteSpace: 'pre-wrap'}}>{description}</Typography>
             </div>
 
             <div style={styles.buttonRow}>
