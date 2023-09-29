@@ -1,5 +1,6 @@
 import EventPage from "./event";
 import { loadEvent } from "../queries";
+import { Metadata, ResolvingMetadata } from 'next'
 
 // This is a server-side rendered component,
 // so that it can easily load data from the database
@@ -18,3 +19,28 @@ export default async function EventPageLoader(
 
     return <EventPage event={event} />
 }
+
+ 
+type MetaDataProps = {
+    params: { event: string }
+    searchParams: { [key: string]: string | string[] | undefined }
+  }
+
+export async function generateMetadata(
+    { params }: MetaDataProps,
+    parent: ResolvingMetadata
+): Promise<Metadata> {
+    // Get the event id from the URL
+    const { event: eventId } = params;
+    const event = await loadEvent(eventId);
+
+    if (!event) {
+        return {
+            title: 'Event not found',
+        }
+    }
+
+    return {
+        title: event.title,
+    }
+};
