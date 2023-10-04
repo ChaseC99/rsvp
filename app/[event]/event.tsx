@@ -15,6 +15,7 @@ import { getAttendeeCount } from "../_utils/helpers";
 import EventForm from "../_components/event-form";
 import ModalContent from "../_components/modal-content";
 import EventMenu from "./event-menu";
+import CalendarDownload from "./calendar-download";
 
 type EventDetailProps = {
     icon: React.ReactNode,
@@ -139,6 +140,7 @@ export default function EventPage({ event }: EventPageProps) {
     const [showEditEvent, setShowEditEvent] = useState(false);
     const [showDeleteEvent, setShowDeleteEvent] = useState(false);
     const [rsvpDefaultValues, setRsvpDefaultValues] = useState<Partial<Attendee> | null>(null);
+    const [calendarTooltipOpen, setCalendarTooltipOpen] = useState(false);
     const deleteEventPasswordRef = useRef<HTMLInputElement>(null);
     const { title, id, date, description, location, attendees, changelog } = event;
     const supplies = getSuppliesFromAttendees(attendees);
@@ -226,6 +228,12 @@ export default function EventPage({ event }: EventPageProps) {
 
         router.refresh();
 
+        // Wait half a second, then show the calendar tooltip
+        // to let the user know they can download the event
+        setTimeout(() => setCalendarTooltipOpen(true), 500);
+        // Wait 8 seconds, then hide the calendar tooltip
+        setTimeout(() => setCalendarTooltipOpen(false), 8000);
+
         return Promise.resolve();
     }
 
@@ -308,7 +316,7 @@ export default function EventPage({ event }: EventPageProps) {
                         })
                     }
                 />
-                <Typography variant="body1" style={{whiteSpace: 'pre-wrap'}}>{description}</Typography>
+                <Typography variant="body1" style={{ whiteSpace: 'pre-wrap' }}>{description}</Typography>
             </div>
 
             <div style={styles.buttonRow}>
@@ -321,10 +329,19 @@ export default function EventPage({ event }: EventPageProps) {
                     RSVP
                 </Button>
 
-                <EventMenu
-                    onEdit={() => setShowEditEvent(true)}
-                    onDelete={() => setShowDeleteEvent(true)}
-                />
+                <div style={styles.iconButtons}>
+                    <CalendarDownload
+                        event={event}
+                        tooltipOpen={calendarTooltipOpen}
+                        onOpen={() => setCalendarTooltipOpen(true)}
+                        onClose={() => setCalendarTooltipOpen(false)}
+                    />
+
+                    <EventMenu
+                        onEdit={() => setShowEditEvent(true)}
+                        onDelete={() => setShowDeleteEvent(true)}
+                    />
+                </div>
             </div>
 
             <Attendees
@@ -375,8 +392,8 @@ export default function EventPage({ event }: EventPageProps) {
                     />
                 </ModalContent>
             </Modal>
-            <Dialog 
-                open={showDeleteEvent} 
+            <Dialog
+                open={showDeleteEvent}
                 onClose={() => setShowDeleteEvent(false)}
                 fullWidth
             >
@@ -391,12 +408,12 @@ export default function EventPage({ event }: EventPageProps) {
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button 
+                    <Button
                         onClick={() => setShowDeleteEvent(false)}
                     >
                         Cancel
                     </Button>
-                    <Button 
+                    <Button
                         onClick={async () => {
                             await handleDeleteEvent()
                             setShowDeleteEvent(false)
@@ -429,5 +446,8 @@ const styles = {
         justifyContent: 'space-between',
         alignItems: 'center',
         margin: '2rem 0',
+    },
+    iconButtons: {
+        display: 'flex',
     },
 };
