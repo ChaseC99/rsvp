@@ -11,8 +11,12 @@ type CalendarDownloadProps = {
 
 export default function CalendarDownload({ event, tooltipOpen, onOpen, onClose }: CalendarDownloadProps) {
     const { title, location } = event;
-    // Add the event url to the description
-    const description = event.description ? event.description + `\n\nhttps://rsvp.chase.link/${event.id}` : `https://rsvp.chase.link/${event.id}`;
+    
+    // Add the location to the description, because gcal ios app doesn't include it :(
+    var description = event.description ? event.description + `\n\nLocation: ${location}` : `Location: ${location}`;
+    // Add the rsvp link to the description
+    description += `\n\nhttps://rsvp.chase.link/${event.id}`;
+
     // Google Calendar requires the date to be in a specific format
     // YYYYMMDDTHHmmSSZ/YYYYMMDDTHHmmSSZ
     const date = event.date.toISOString().replace(/-|:|\.\d+/g, '');
