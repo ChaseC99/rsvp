@@ -1,9 +1,13 @@
 import { Accordion, AccordionDetails, AccordionSummary, Typography } from "@mui/material";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
-export default function Collapsable({ title, children }: { title: string, children: React.ReactNode }) {
+type CollapsableProps = {
+    title: string,
+    children: React.ReactNode,
+}
+export default function Collapsable({ title, children }: CollapsableProps) {
     return (
-        <Accordion elevation={0} disableGutters style={styles.accordian}>
+        <Accordion elevation={0} disableGutters sx={styles.accordian}>
             <AccordionSummary
                 expandIcon={<ExpandMoreIcon />}
                 aria-controls="panel1a-content"
@@ -21,7 +25,9 @@ export default function Collapsable({ title, children }: { title: string, childr
 
 const styles = {
     accordian: {
-        borderTop: "1px solid rgba(0, 0, 0, 0.12)",
+        '&:before': {
+            backgroundColor: 'transparent !important',
+        },
     },
     summary: {
         flexDirection: "row-reverse" as const,
