@@ -1,12 +1,9 @@
 // NOTE: These exports can only be used by the /api and server rendered components
 // If you need to use a query in a client side component, you should create a new api route
 // that the client side component can call instead
-import { PrismaClient } from '@prisma/client'
+import prisma from './db'
 import type { Event, Attendee } from './types';
 import { ONE_DAY } from './_utils/constants';
-
-// Initial Prisma client 
-const prisma = new PrismaClient()
 
 // EVENT QUERIES
 /**
