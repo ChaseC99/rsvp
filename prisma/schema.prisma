@@ -15,15 +15,15 @@ datasource db {
 }
 
 model Event {
-  id          String     @id @unique @default(uuid())
-  title       String
-  date        DateTime
-  description String
-  location    String
-  cancelled   Boolean    @default(false)
-  type        String?
-  changelog   String[]
-  attendees   Attendee[]
+  id              String     @id @unique @default(uuid())
+  title           String
+  date            DateTime
+  description     String
+  location        String
+  cancelled       Boolean    @default(false)
+  defaultSupplies String[]   @default([])
+  changelog       String[]
+  attendees       Attendee[]
 }
 
 model Attendee {
@@ -32,6 +32,7 @@ model Attendee {
   name      String
   guests    String[]
   supplies  Supply[]
+  tentative Boolean  @default(false)
 
   Event   Event?  @relation(fields: [eventId], references: [id], onDelete: Cascade)
   eventId String?

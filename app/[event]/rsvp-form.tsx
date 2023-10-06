@@ -6,7 +6,7 @@ import type {
     Attendee,
 } from "../types";
 import LabeledCounterGroup from "../_components/labeled-counter-group";
-import GuestListInput from "../_components/guests-list-input";
+import ListInput from "../_components/list-input";
 import Collapsable from "../_components/collapsable";
 import { LabeledValue } from "../_components/labeled-counter";
 import { LoadingButton } from "@mui/lab";
@@ -21,12 +21,13 @@ type RSVPModalProps = {
     onSubmit: (attendee: Partial<Attendee>) => void,
     onClose: () => void,
     defaultValues?: Partial<Attendee> | null,
+    defaultSupplies?: string[], 
     isEditing?: boolean,
     onDelete?: (id: string) => void,
 }
 
 export default function RsvpForm(props: RSVPModalProps) {
-    const { onSubmit, onDelete, onClose, defaultValues, isEditing = false } = props;
+    const { onSubmit, onDelete, onClose, defaultValues, defaultSupplies = [], isEditing = false } = props;
     const { id, name: initialName, guests: initialGuests, supplies: initialSupplies } = defaultValues || {};
 
     const [submitIsLoading, setSubmitIsLoading] = useState(false);
@@ -34,7 +35,7 @@ export default function RsvpForm(props: RSVPModalProps) {
     const [guests, setGuests] = useState<string[]>(initialGuests || [""]);
     const [supplies, setSupplies] = useState<LabeledValue[]>(
         initialSupplies?.map(supply => ({ label: supply.item, value: supply.quantity })) || 
-        [{label: "Ball", value: 0}, {label: "Net", value: 0}] as LabeledValue[]
+        defaultSupplies.map(defaultSupply => ({label: defaultSupply, value: 0})) as LabeledValue[]
     );
     // TODO: implement tdb on backend
     const tbdRef = useRef<HTMLButtonElement>(null);
@@ -82,7 +83,7 @@ export default function RsvpForm(props: RSVPModalProps) {
             </Collapsable>
 
             <Collapsable title="Guests">
-                <GuestListInput guests={guests} onChange={(guests) => setGuests(guests)} />
+                <ListInput placeholder="Guest" items={guests} onChange={(guests) => setGuests(guests)} />
             </Collapsable>
 
             <LoadingButton

@@ -8,7 +8,7 @@ export async function POST(request: Request): Promise<Response> {
         date,
         description,
         cancelled,
-        type,
+        defaultSupplies,
         location,
     } = await request.json();
 
@@ -19,7 +19,7 @@ export async function POST(request: Request): Promise<Response> {
         description,
         location,
         cancelled,
-        type,
+        defaultSupplies,
         changelog: [],
         attendees: [],
     });

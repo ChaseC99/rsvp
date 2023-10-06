@@ -387,6 +387,8 @@ export default function EventPage({ event }: EventPageProps) {
             The following are modals and dialogs that are normally hidden
             but may be shown depending on user interaction 
             */}
+
+            {/* Create RSVP Modal */}
             <Modal
                 open={showRsvp}
                 onClose={() => setShowRsvp(false)}
@@ -395,9 +397,12 @@ export default function EventPage({ event }: EventPageProps) {
                     <RsvpForm
                         onClose={() => setShowRsvp(false)}
                         onSubmit={handleCreateRsvp}
+                        defaultSupplies={event.defaultSupplies}
                     />
                 </ModalContent>
             </Modal>
+
+            {/* Edit RSVP Modal */}
             <Modal
                 open={showEditRsvp}
                 onClose={() => setShowEditRsvp(false)}
@@ -408,10 +413,13 @@ export default function EventPage({ event }: EventPageProps) {
                         onClose={() => setShowEditRsvp(false)}
                         onSubmit={handleUpdateRsvp}
                         defaultValues={rsvpDefaultValues}
+                        defaultSupplies={event.defaultSupplies}
                         onDelete={handleDeleteRsvp}
                     />
                 </ModalContent>
             </Modal>
+
+            {/* Edit Event Modal */}
             <Modal
                 open={showEditEvent}
                 onClose={() => setShowEditEvent(false)}
@@ -424,6 +432,8 @@ export default function EventPage({ event }: EventPageProps) {
                     />
                 </ModalContent>
             </Modal>
+
+            {/* Delete Event Dialog */}
             <Dialog
                 open={showDeleteEvent}
                 onClose={() => setShowDeleteEvent(false)}

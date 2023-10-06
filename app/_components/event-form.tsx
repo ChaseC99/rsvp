@@ -3,6 +3,8 @@
 import { useRef, useState } from "react";
 import { LoadingButton } from "@mui/lab";
 import { Autocomplete, TextField } from "@mui/material";
+import Collapsable from "./collapsable";
+import ListInput from "./list-input";
 import DatePicker from "../_components/date-picker";
 import { Event } from "../types";
 
@@ -18,6 +20,7 @@ export default function EventForm(props: EventFormProps) {
     const [submitIsLoading, setSubmitIsLoading] = useState(false);
     const [title, setTitle] = useState(event?.title || "");
     const [date, setDate] = useState(event?.date || "");
+    const [defaultSupplies, setDefaultSupplies] = useState(event?.defaultSupplies || []);
     const descriptionRef = useRef<HTMLTextAreaElement>(null);
     const locationRef = useRef<HTMLInputElement>(null);
 
@@ -33,6 +36,7 @@ export default function EventForm(props: EventFormProps) {
             date: new Date(date),
             description,
             location,
+            defaultSupplies,
         };
 
         await onSubmit(event);
@@ -80,6 +84,14 @@ export default function EventForm(props: EventFormProps) {
                 inputRef={descriptionRef}
                 defaultValue={event?.description}
             />
+
+            <Collapsable title="Suggested Supplies">
+                <ListInput 
+                    placeholder="Supply"
+                    items={defaultSupplies} 
+                    onChange={(defaultSupplies) => setDefaultSupplies(defaultSupplies)} 
+                />
+            </Collapsable>
 
             <LoadingButton
                 disabled={title === ""}
