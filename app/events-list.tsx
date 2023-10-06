@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { Card, Divider, Typography } from "@mui/material";
+import { Alert, Card, Divider, Typography } from "@mui/material";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { getAttendeeCount } from "./_utils/helpers";
 import type { Event } from "./types";
@@ -8,11 +8,11 @@ import type { Event } from "./types";
 export default function EventsList({ events }: { events: Event[] }) {
     return (
         <div style={styles.wrapper}>
-            {events.map(({ title, id, date, location, attendees }) => (
+            {events.map(({ title, id, date, location, attendees, cancelled }) => (
                 <Link key={id} href={`/${id}`}>
                     <Card style={styles.card}>
                         <div style={styles.cardHeader}>
-                            <Typography variant='h3' style={{ fontSize: "2rem" }}>
+                            <Typography variant='h3' style={{...styles.title, ...(cancelled && styles.cancelled)}}>
                                 {title}
                             </Typography>
                             <div style={styles.attendeeCount}>
@@ -22,7 +22,7 @@ export default function EventsList({ events }: { events: Event[] }) {
                                 <AccountCircleIcon fontSize="large" />
                             </div>
                         </div>
-                        <div>
+                        <div style={{...(cancelled && styles.cancelled)}}>
                             <Typography variant='body1' style={{ display: "flex", gap: "0.5rem" }}>
                                 {date.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
                                 <Divider orientation="vertical" flexItem />
@@ -32,6 +32,11 @@ export default function EventsList({ events }: { events: Event[] }) {
                                 {location}
                             </Typography>
                         </div>
+                        {cancelled && (
+                            <Alert severity="error" style={{marginTop: 16}}>
+                                This event has been cancelled
+                            </Alert>
+                        )}
                     </Card>
                 </Link>
             ))
@@ -41,6 +46,9 @@ export default function EventsList({ events }: { events: Event[] }) {
 }
 
 const styles = {
+    cancelled: {
+        textDecoration: "line-through",
+    },
     wrapper: {
         margin: "1rem 0",
         display: "flex",
@@ -57,6 +65,9 @@ const styles = {
         alignItems: "center",
         gap: "2rem",
         marginBottom: "1rem",
+    },
+    title: {
+        fontSize: "2rem",
     },
     attendeeCount: {
         display: "flex",

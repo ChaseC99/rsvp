@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, List, ListItem, ListItemText, Modal, TextField, Typography } from "@mui/material";
+import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, List, ListItem, ListItemText, Modal, TextField, Typography } from "@mui/material";
 import { useRef, useState } from "react"
 import type {
     Attendee,
@@ -170,6 +170,29 @@ export default function EventPage({ event }: EventPageProps) {
         return Promise.resolve();
     }
 
+    const handleCancelEvent = async () => {
+        const endpoint = `/api/event`;
+
+        const data = {
+            eventId: id,
+            cancelled: !event.cancelled
+        }
+
+        const options = {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ ...data }),
+        }
+
+        const resp = await fetch(endpoint, options);
+
+        router.refresh();
+
+        return Promise.resolve();
+    }
+
     const handleDeleteEvent = async () => {
         // I know, super secure right?
         // Maybe we'll do real auth later but for now this is 
@@ -292,13 +315,18 @@ export default function EventPage({ event }: EventPageProps) {
 
     return (
         <div>
-            <div style={styles.header}>
+            {event.cancelled && (
+                <Alert severity="error" style={{marginBottom: 16}}>
+                    This event has been cancelled
+                </Alert>
+            )}
+            <div style={{...styles.header, ...(event.cancelled && styles.cancelled)}}>
                 <Typography variant="h2">
                     {title}
                 </Typography>
             </div>
 
-            <div style={styles.details}>
+            <div style={{...styles.details, ...(event.cancelled && styles.cancelled)}}>
                 <EventDetail
                     icon={<PublicTwoToneIcon />}
                     text={location}
@@ -325,6 +353,7 @@ export default function EventPage({ event }: EventPageProps) {
                     variant="contained"
                     color="success"
                     size="large"
+                    disabled={event.cancelled}
                 >
                     RSVP
                 </Button>
@@ -332,13 +361,16 @@ export default function EventPage({ event }: EventPageProps) {
                 <div style={styles.iconButtons}>
                     <CalendarDownload
                         event={event}
+                        disabled={event.cancelled}
                         tooltipOpen={calendarTooltipOpen}
                         onOpen={() => setCalendarTooltipOpen(true)}
                         onClose={() => setCalendarTooltipOpen(false)}
                     />
 
                     <EventMenu
+                        cancelled={event.cancelled}
                         onEdit={() => setShowEditEvent(true)}
+                        onCancel={handleCancelEvent}
                         onDelete={() => setShowDeleteEvent(true)}
                     />
                 </div>
@@ -429,6 +461,9 @@ export default function EventPage({ event }: EventPageProps) {
 }
 
 const styles = {
+    cancelled: {
+        textDecoration: 'line-through',
+    },
     header: {
         marginBottom: '1rem',
     },

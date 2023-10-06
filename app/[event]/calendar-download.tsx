@@ -4,12 +4,13 @@ import { Event } from "../types"
 
 type CalendarDownloadProps = {
     event: Event,
+    disabled?: boolean,
     tooltipOpen?: boolean,
     onOpen?: () => void,
     onClose?: () => void,
 }
 
-export default function CalendarDownload({ event, tooltipOpen, onOpen, onClose }: CalendarDownloadProps) {
+export default function CalendarDownload({ event, disabled, tooltipOpen, onOpen, onClose }: CalendarDownloadProps) {
     const { title, location } = event;
     
     // Add the location to the description, because gcal ios app doesn't include it :(
@@ -41,6 +42,7 @@ export default function CalendarDownload({ event, tooltipOpen, onOpen, onClose }
                 href={gcalAddEventUrl.toString()}
                 target="_blank"
                 rel="noreferrer"
+                disabled={disabled}
             >
                 <InsertInvitationIcon />
             </Button>

@@ -1,4 +1,4 @@
-import { createEvent, updateEvent, deleteEvent } from "@/app/queries";
+import { createEvent, updateEvent, deleteEvent, cancelEvent } from "@/app/queries";
 
 // Create a new event
 export async function POST(request: Request): Promise<Response> {
@@ -31,6 +31,13 @@ export async function POST(request: Request): Promise<Response> {
 export async function PUT(request: Request): Promise<Response> {
     const event = await request.json();
     await updateEvent(event);
+    return new Response(null, { status: 200 });
+}
+
+// Patch an existing event (cancel/uncancel)
+export async function PATCH(request: Request): Promise<Response> {
+    const { eventId, cancelled } = await request.json();
+    await cancelEvent(eventId, cancelled);
     return new Response(null, { status: 200 });
 }
 

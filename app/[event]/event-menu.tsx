@@ -4,7 +4,9 @@ import { Button, Divider, Menu, MenuItem } from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
 
 type EventMenuProps = {
+    cancelled: boolean,
     onEdit: () => void,
+    onCancel: () => void,
     onDelete: () => void,
 };
 export default function EventMenu(props: EventMenuProps) {
@@ -19,6 +21,11 @@ export default function EventMenu(props: EventMenuProps) {
 
     const handleEditClick = () => {
         props.onEdit();
+        handleClose();
+    }
+
+    const handleCancelClick = () => {
+        props.onCancel();
         handleClose();
     }
 
@@ -48,6 +55,8 @@ export default function EventMenu(props: EventMenuProps) {
                 }}
             >
                 <MenuItem onClick={handleEditClick}>Edit Event</MenuItem>
+                <Divider />
+                <MenuItem onClick={handleCancelClick}>{props.cancelled ? "Uncancel Event" : "Cancel Event"}</MenuItem>
                 <Divider />
                 <MenuItem onClick={handleDeleteClick}>Delete Event</MenuItem>
             </Menu>

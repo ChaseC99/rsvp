@@ -102,6 +102,21 @@ export async function updateEvent(event: Event): Promise<void> {
 };
 
 /**
+ * Cancel an event
+ * @param eventId
+ */
+export async function cancelEvent(eventId: string, cancelled: boolean): Promise<void> {
+    await prisma.event.update({
+        where: {
+            id: eventId
+        },
+        data: {
+            cancelled: cancelled
+        }
+    })
+};
+
+/**
  * Delete an event
  * @param eventId 
  */
