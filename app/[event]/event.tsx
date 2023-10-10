@@ -16,6 +16,8 @@ import EventForm from "../_components/event-form";
 import ModalContent from "../_components/modal-content";
 import EventMenu from "./event-menu";
 import CalendarDownload from "./calendar-download";
+import Markdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 type EventDetailProps = {
     icon: React.ReactNode,
@@ -316,17 +318,17 @@ export default function EventPage({ event }: EventPageProps) {
     return (
         <div>
             {event.cancelled && (
-                <Alert severity="error" style={{marginBottom: 16}}>
+                <Alert severity="error" style={{ marginBottom: 16 }}>
                     This event has been cancelled
                 </Alert>
             )}
-            <div style={{...styles.header, ...(event.cancelled && styles.cancelled)}}>
+            <div style={{ ...styles.header, ...(event.cancelled && styles.cancelled) }}>
                 <Typography variant="h2">
                     {title}
                 </Typography>
             </div>
 
-            <div style={{...styles.details, ...(event.cancelled && styles.cancelled)}}>
+            <div style={{ ...styles.details, ...(event.cancelled && styles.cancelled) }}>
                 <EventDetail
                     icon={<PublicTwoToneIcon />}
                     text={location}
@@ -344,7 +346,10 @@ export default function EventPage({ event }: EventPageProps) {
                         })
                     }
                 />
-                <Typography variant="body1" style={{ whiteSpace: 'pre-wrap' }}>{description}</Typography>
+
+                <div style={styles.markdownText}>
+                    <Markdown remarkPlugins={[remarkGfm]}>{description}</Markdown>
+                </div>
             </div>
 
             <div style={styles.buttonRow}>
@@ -495,4 +500,14 @@ const styles = {
     iconButtons: {
         display: 'flex',
     },
+    markdownText: {
+        whiteSpace: 'pre-wrap' as const,
+
+        // Styling to match the Typography component
+        fontFamily: '"Roboto","Helvetica","Arial",sans-serif',
+        fontWeight: 400,
+        fontSize: "1rem",
+        lineHeight: 1.5,
+        letterSpacing: "0.00938em",
+    }
 };
