@@ -33,6 +33,7 @@ export default function ListInput({ placeholder, items, onChange }: ListInputPro
                 return (
                     <div style={{ margin: "8px 0" }} key={index}>
                         <TextField
+                            id={`list-input-${index}`}
                             placeholder={isLastItem ? `Add a new ${placeholder.toLowerCase()}` : placeholder}
                             variant="standard"
                             style={{width: isLastItem ? "100%" : "calc(100% - 40px)"}}
@@ -44,6 +45,15 @@ export default function ListInput({ placeholder, items, onChange }: ListInputPro
                                     newItems.push("");
                                 };
                                 handleNewItems(newItems);
+                            }}
+                            onKeyDown={(event) => {
+                                // On enter pressed, move the cursor to the next input instead of submitting the form
+                                if (event.key === "Enter") {
+                                    event.preventDefault();
+
+                                    // Focus on next input
+                                    document.getElementById(`list-input-${index + 1}`)?.focus();
+                                }
                             }}
                         />
 
