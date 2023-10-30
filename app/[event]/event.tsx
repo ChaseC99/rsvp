@@ -11,7 +11,7 @@ import CalendarMonthTwoToneIcon from '@mui/icons-material/CalendarMonthTwoTone';
 import ScheduleIcon from '@mui/icons-material/Schedule';
 
 import RsvpForm from "./rsvp-form";
-import { getAttendeeCount } from "../_utils/helpers";
+import { getAttendeeCount, getMaybeCount } from "../_utils/helpers";
 import EventForm from "../_components/event-form";
 import ModalContent from "../_components/modal-content";
 import EventMenu from "./event-menu";
@@ -39,8 +39,14 @@ type AttendeeProps = {
 function Attendees(props: AttendeeProps) {
     const { attendees, onClick } = props;
     const numAttending = getAttendeeCount(attendees);
+    const numMaybe = getMaybeCount(attendees);
 
-    if (numAttending === 0) return null;
+    if (attendees.length === 0) return null;
+
+    let countString = `${numAttending} Going`;
+    if (numMaybe > 0) {
+        countString += ` · ${numMaybe} Maybe`;
+    }
 
     const handleOnClick = (attendee: Partial<Attendee>) => {
         onClick(attendee);
@@ -48,13 +54,13 @@ function Attendees(props: AttendeeProps) {
 
     return (
         <div>
-            <Typography variant="h5">Attending · {numAttending}</Typography>
+            <Typography variant="h5">{countString}</Typography>
             <Divider />
             <List>
                 {attendees.map((attendee) => (
                     <ListItem key={attendee.id} onClick={() => handleOnClick(attendee)}>
                         <ListItemText>
-                            {attendee.name}
+                            {attendee.name + (attendee.tentative ? " (maybe)" : "")}
                             {attendee.guests.length > 0 &&
                                 <p>Guests: {attendee.guests.join(", ")}</p>
                             }
@@ -228,15 +234,12 @@ export default function EventPage({ event }: EventPageProps) {
     }
 
     const handleCreateRsvp = async (rspv: Partial<Attendee>) => {
-        const { name, guests, supplies } = rspv;
         const endpoint = '/api/rsvp';
 
         const data = {
             attendee: {
-                name,
+                ...rspv,
                 eventId: id,
-                supplies,
-                guests
             }
         }
 

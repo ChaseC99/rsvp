@@ -28,7 +28,7 @@ type RSVPModalProps = {
 
 export default function RsvpForm(props: RSVPModalProps) {
     const { onSubmit, onDelete, onClose, defaultValues, defaultSupplies = [], isEditing = false } = props;
-    const { id, name: initialName, guests: initialGuests, supplies: initialSupplies } = defaultValues || {};
+    const { id, name: initialName, guests: initialGuests, supplies: initialSupplies, tentative: initialTenative } = defaultValues || {};
 
     const [submitIsLoading, setSubmitIsLoading] = useState(false);
     const [name, setName] = useState(initialName || "");
@@ -37,21 +37,24 @@ export default function RsvpForm(props: RSVPModalProps) {
         initialSupplies?.map(supply => ({ label: supply.item, value: supply.quantity })) || 
         defaultSupplies.map(defaultSupply => ({label: defaultSupply, value: 0})) as LabeledValue[]
     );
-    // TODO: implement tdb on backend
-    const tbdRef = useRef<HTMLButtonElement>(null);
+    const [tentative, setTentative] = useState(initialTenative || false);
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
         setSubmitIsLoading(true);
 
-        // create uuid
-
         const filteredGuests = guests.filter((guest) => guest !== "");
         const filteredSupplies = supplies.filter(({ label, value }) => label !== "" && value > 0)
             .map(({ label: item, value: quantity }) => ({ item, quantity }));
 
-        await onSubmit({ id, name, guests: filteredGuests, supplies: filteredSupplies });
+        await onSubmit({ 
+            id, 
+            name, 
+            guests: filteredGuests, 
+            supplies: filteredSupplies,
+            tentative,
+        });
 
         setSubmitIsLoading(false);
         onClose();
@@ -76,7 +79,12 @@ export default function RsvpForm(props: RSVPModalProps) {
                 value={name}
                 onChange={(event) => setName(event.target.value)}
             />
-            {/* <FormControlLabel control={<Checkbox ref={tbdRef} />} label="Tentatively coming" /> */}
+            <FormControlLabel 
+                control={
+                    <Checkbox checked={tentative} onChange={(event) => setTentative(event.target.checked)} />
+                } 
+                label="Maybe coming" 
+            />
 
             <Collapsable title="Supplies">
                 <LabeledCounterGroup labels={supplies} onChange={(supplies) => setSupplies(supplies)} />
