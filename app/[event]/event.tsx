@@ -27,8 +27,28 @@ function EventDetail({ icon, text }: EventDetailProps) {
     return (
         <div style={styles.detail}>
             {icon}
-            <Typography variant="body1">{text}</Typography>
+            <Typography variant="body1" sx={{whiteSpace: "pre-wrap"}}>
+                {text}
+            </Typography>
         </div>
+    )
+}
+
+type LocationProps = {
+    location: string,
+}
+function Location({ location }: LocationProps) {
+    if (!location) return null;
+
+    const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`;
+
+    return (
+        <a href={mapsUrl} target="_blank">
+            <EventDetail
+                icon={<PublicTwoToneIcon />}
+                text={location}
+            />
+        </a>
     )
 }
 
@@ -325,17 +345,14 @@ export default function EventPage({ event }: EventPageProps) {
                     This event has been cancelled
                 </Alert>
             )}
-            <div style={{ ...styles.header, ...(event.cancelled && styles.cancelled) }}>
+            <div style={{ ...styles.header, ...(event.cancelled ? styles.cancelled : {}) }}>
                 <Typography variant="h2">
                     {title}
                 </Typography>
             </div>
 
-            <div style={{ ...styles.details, ...(event.cancelled && styles.cancelled) }}>
-                <EventDetail
-                    icon={<PublicTwoToneIcon />}
-                    text={location}
-                />
+            <div style={{ ...styles.details, ...(event.cancelled ? styles.cancelled : {}) }}>
+                <Location location={location} />
                 <EventDetail
                     icon={<CalendarMonthTwoToneIcon />}
                     text={date.toDateString()}
