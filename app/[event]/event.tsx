@@ -96,6 +96,9 @@ function Attendees(props: AttendeeProps) {
                             {attendee.guests.length > 0 &&
                                 <p>Guests: {attendee.guests.join(", ")}</p>
                             }
+                            {attendee.comment && (
+                                <p><i>{attendee.comment}</i></p>
+                            )}
                         </ListItemText>
                     </ListItem>
                 ))}

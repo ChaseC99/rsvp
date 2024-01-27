@@ -28,7 +28,14 @@ type RSVPModalProps = {
 
 export default function RsvpForm(props: RSVPModalProps) {
     const { onSubmit, onDelete, onClose, defaultValues, defaultSupplies = [], isEditing = false } = props;
-    const { id, name: initialName, guests: initialGuests, supplies: initialSupplies, tentative: initialTenative } = defaultValues || {};
+    const { 
+        id, 
+        name: initialName, 
+        guests: initialGuests, 
+        supplies: initialSupplies, 
+        tentative: initialTenative,
+        comment: initialComment,
+    } = defaultValues || {};
 
     const [submitIsLoading, setSubmitIsLoading] = useState(false);
     const [name, setName] = useState(initialName || localStorage.getItem('name') || "");
@@ -38,6 +45,7 @@ export default function RsvpForm(props: RSVPModalProps) {
         defaultSupplies.map(defaultSupply => ({label: defaultSupply, value: 0})) as LabeledValue[]
     );
     const [tentative, setTentative] = useState(initialTenative || false);
+    const [comment, setComment] = useState(initialComment || "");
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -54,6 +62,7 @@ export default function RsvpForm(props: RSVPModalProps) {
             guests: filteredGuests, 
             supplies: filteredSupplies,
             tentative,
+            comment: comment || null,
         });
 
         localStorage.setItem('name', name);
@@ -94,6 +103,14 @@ export default function RsvpForm(props: RSVPModalProps) {
             <Collapsable title="Guests">
                 <ListInput placeholder="Guest" items={guests} onChange={(guests) => setGuests(guests)} />
             </Collapsable>
+
+            <TextField
+                id="comment"
+                label="Comment"
+                variant="outlined"
+                value={comment}
+                onChange={(event) => setComment(event.target.value)}
+            />
 
             <LoadingButton
                 type="submit"

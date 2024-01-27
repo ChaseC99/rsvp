@@ -33,6 +33,7 @@ model Attendee {
   guests    String[]
   supplies  Supply[]
   tentative Boolean  @default(false)
+  comment   String?
 
   Event   Event?  @relation(fields: [eventId], references: [id], onDelete: Cascade)
   eventId String?
