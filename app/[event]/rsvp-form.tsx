@@ -31,7 +31,7 @@ export default function RsvpForm(props: RSVPModalProps) {
     const { id, name: initialName, guests: initialGuests, supplies: initialSupplies, tentative: initialTenative } = defaultValues || {};
 
     const [submitIsLoading, setSubmitIsLoading] = useState(false);
-    const [name, setName] = useState(initialName || "");
+    const [name, setName] = useState(initialName || localStorage.getItem('name') || "");
     const [guests, setGuests] = useState<string[]>(initialGuests || [""]);
     const [supplies, setSupplies] = useState<LabeledValue[]>(
         initialSupplies?.map(supply => ({ label: supply.item, value: supply.quantity })) || 
@@ -56,6 +56,7 @@ export default function RsvpForm(props: RSVPModalProps) {
             tentative,
         });
 
+        localStorage.setItem('name', name);
         setSubmitIsLoading(false);
         onClose();
     }
