@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, List, ListItem, ListItemText, Modal, TextField, Typography } from "@mui/material";
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import type {
     Attendee,
     Event,
@@ -38,9 +38,21 @@ type LocationProps = {
     location: string,
 }
 function Location({ location }: LocationProps) {
+    const [preferAppleMaps, setPreferAppleMaps] = useState(false);
+    useEffect(() => {
+        // Note: navigator.platform is deprecated but iOS still supports it
+        if (navigator.platform.includes('iPhone')) {
+            setPreferAppleMaps(true);
+        }
+    }, [])
+
     if (!location) return null;
 
-    const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`;
+    // If the user is on an iPhone, use the Apple Maps URL
+    // Otherwise, use the Google Maps URL
+    const mapsUrl = preferAppleMaps ? 
+        `http://maps.apple.com?q=${encodeURIComponent(location)}` : 
+        `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`;
 
     return (
         <a href={mapsUrl} target="_blank">
