@@ -56,7 +56,11 @@ export default function EventForm(props: EventFormProps) {
                 onChange={(event) => setTitle(event.target.value)}
             />
 
-            <DatePicker onChange={setDate} defaultValue={event?.date} />
+            <DatePicker 
+                onChange={setDate} 
+                defaultValue={event?.date} 
+                label="Start Time"
+            />
 
             <Autocomplete
                 id="location"
