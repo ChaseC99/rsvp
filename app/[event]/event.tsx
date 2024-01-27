@@ -353,6 +353,12 @@ export default function EventPage({ event }: EventPageProps) {
         setShowEditRsvp(true);
     }
 
+    const eventDate = date.toDateString();
+    const eventTime = date.toLocaleTimeString([], {
+        hour: 'numeric',
+        minute: '2-digit',
+    });
+
     return (
         <div>
             {event.cancelled && (
@@ -370,18 +376,17 @@ export default function EventPage({ event }: EventPageProps) {
                 <Location location={location} />
                 <EventDetail
                     icon={<CalendarMonthTwoToneIcon />}
-                    text={date.toDateString()}
+                    text={eventDate}
                 />
-                <EventDetail
-                    icon={<ScheduleIcon />}
-                    text={
-                        date.toLocaleTimeString([], {
-                            hour: 'numeric',
-                            minute: '2-digit',
-                        })
-                    }
-                />
-
+                {
+                    // Don't show the time if it's 12:00 AM
+                    // 12:00 AM is the default when no time is specified
+                    eventTime !== '12:00 AM' &&
+                    <EventDetail
+                        icon={<ScheduleIcon />}
+                        text={eventTime}
+                    />
+                }
                 <div style={styles.markdownText}>
                     <Markdown remarkPlugins={[remarkGfm]}>{description}</Markdown>
                 </div>
