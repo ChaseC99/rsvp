@@ -89,7 +89,7 @@ export default function EventForm(props: EventFormProps) {
                 defaultValue={event?.description}
             />
 
-            <Collapsable title="Suggested Supplies">
+            <Collapsable title="Suggested Supplies" outlined={true}>
                 <ListInput 
                     placeholder="Supply"
                     items={defaultSupplies} 

@@ -4,10 +4,17 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 type CollapsableProps = {
     title: string,
     children: React.ReactNode,
+    outlined?: boolean,
 }
-export default function Collapsable({ title, children }: CollapsableProps) {
+export default function Collapsable({ title, children, outlined }: CollapsableProps) {
     return (
-        <Accordion elevation={0} disableGutters sx={styles.accordian}>
+        <Accordion 
+            elevation={0} 
+            disableGutters 
+            sx={{
+                ...styles.accordian,
+                ...(outlined ? styles.outlined : {})
+            }}>
             <AccordionSummary
                 expandIcon={<ExpandMoreIcon />}
                 aria-controls="panel1a-content"
@@ -28,6 +35,12 @@ const styles = {
         '&:before': {
             backgroundColor: 'transparent !important',
         },
+    },
+    outlined: {
+        borderWidth: "1px",
+        borderColor: "rgba(0, 0, 0, 0.23)",
+        borderStyle: "solid",
+        borderRadius: "4px",
     },
     summary: {
         flexDirection: "row-reverse" as const,
