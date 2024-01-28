@@ -6,8 +6,10 @@ import type {
     Attendee,
     Event,
 } from "../types";
+import CategoryIcon from '@mui/icons-material/Category';
 import PublicTwoToneIcon from '@mui/icons-material/PublicTwoTone';
 import CalendarMonthTwoToneIcon from '@mui/icons-material/CalendarMonthTwoTone';
+import PeopleIcon from '@mui/icons-material/People';
 import ScheduleIcon from '@mui/icons-material/Schedule';
 
 import RsvpForm from "./rsvp-form";
@@ -27,7 +29,7 @@ function EventDetail({ icon, text }: EventDetailProps) {
     return (
         <div style={styles.detail}>
             {icon}
-            <Typography variant="body1" sx={{whiteSpace: "pre-wrap"}}>
+            <Typography variant="body1" sx={{ whiteSpace: "pre-wrap" }}>
                 {text}
             </Typography>
         </div>
@@ -50,8 +52,8 @@ function Location({ location }: LocationProps) {
 
     // If the user is on an iPhone, use the Apple Maps URL
     // Otherwise, use the Google Maps URL
-    const mapsUrl = preferAppleMaps ? 
-        `http://maps.apple.com?q=${encodeURIComponent(location)}` : 
+    const mapsUrl = preferAppleMaps ?
+        `http://maps.apple.com?q=${encodeURIComponent(location)}` :
         `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`;
 
     return (
@@ -64,11 +66,54 @@ function Location({ location }: LocationProps) {
     )
 }
 
-type AttendeeProps = {
+type AttendeeRowProps = {
+    attendee: Attendee,
+    onClick: (attendee: Partial<Attendee>) => void,
+}
+function AttendeeRow(props: AttendeeRowProps) {
+    const { attendee, onClick } = props;
+
+    const handleOnClick = (attendee: Partial<Attendee>) => {
+        onClick(attendee);
+    }
+
+    return (
+        <ListItem key={attendee.id} onClick={() => handleOnClick(attendee)} sx={styles.attendee}>
+            <ListItemText>
+                <Typography variant="h6">
+                    {attendee.name + (attendee.tentative ? " (maybe)" : "")}
+                </Typography>
+
+                <div style={styles.attendeeDetails}>
+                    {attendee.comment &&
+                        // Comment shoud take up the full width
+                        <p style={{ width: "100%" }}>
+                            <i>{attendee.comment}</i>
+                        </p>
+                    }
+                    {attendee.guests.length > 0 &&
+                        <div style={styles.attendeeDetailsRow}>
+                            <PeopleIcon />
+                            <p>{attendee.guests.join(", ")}</p>
+                        </div>
+                    }
+                    {attendee.supplies.length > 0 &&
+                        <div style={styles.attendeeDetailsRow}>
+                            <CategoryIcon />
+                            <p>{attendee.supplies.map(({ item, quantity }) => `${quantity} ${item}`).join(", ")}</p>
+                        </div>
+                    }
+                </div>
+            </ListItemText>
+        </ListItem>
+    )
+}
+
+type AttendeesProps = {
     attendees: Attendee[],
     onClick: (attendee: Partial<Attendee>) => void,
 }
-function Attendees(props: AttendeeProps) {
+function Attendees(props: AttendeesProps) {
     const { attendees, onClick } = props;
     const numAttending = getAttendeeCount(attendees);
     const numMaybe = getMaybeCount(attendees);
@@ -80,27 +125,17 @@ function Attendees(props: AttendeeProps) {
         countString += ` · ${numMaybe} Maybe`;
     }
 
-    const handleOnClick = (attendee: Partial<Attendee>) => {
-        onClick(attendee);
-    }
-
     return (
         <div>
             <Typography variant="h5">{countString}</Typography>
             <Divider />
             <List>
                 {attendees.map((attendee) => (
-                    <ListItem key={attendee.id} onClick={() => handleOnClick(attendee)}>
-                        <ListItemText>
-                            {attendee.name + (attendee.tentative ? " (maybe)" : "")}
-                            {attendee.guests.length > 0 &&
-                                <p>Guests: {attendee.guests.join(", ")}</p>
-                            }
-                            {attendee.comment && (
-                                <p><i>{attendee.comment}</i></p>
-                            )}
-                        </ListItemText>
-                    </ListItem>
+                    <AttendeeRow
+                        key={attendee.id}
+                        attendee={attendee}
+                        onClick={onClick}
+                    />
                 ))}
             </List>
         </div>
@@ -549,5 +584,24 @@ const styles = {
         fontSize: "1rem",
         lineHeight: 1.5,
         letterSpacing: "0.00938em",
-    }
+    },
+    attendee: {
+        borderWidth: "1px",
+        borderColor: "rgba(0, 0, 0, 0.23)",
+        borderStyle: "solid",
+        borderRadius: "4px",
+        backgroundColor: "#80808020",
+
+        marginBottom: "1rem",
+    },
+    attendeeDetails: {
+        display: "flex",
+        gap: "0.3rem 2rem",
+        flexWrap: "wrap" as "wrap",
+    },
+    attendeeDetailsRow: {
+        display: "flex",
+        flexDirection: "row" as "row",
+        gap: "0.5rem",
+    },
 };
