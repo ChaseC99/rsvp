@@ -96,14 +96,6 @@ export default function RsvpForm(props: RSVPModalProps) {
                 label="Maybe coming" 
             />
 
-            <Collapsable title="Supplies">
-                <LabeledCounterGroup labels={supplies} onChange={(supplies) => setSupplies(supplies)} />
-            </Collapsable>
-
-            <Collapsable title="Guests">
-                <ListInput placeholder="Guest" items={guests} onChange={(guests) => setGuests(guests)} />
-            </Collapsable>
-
             <TextField
                 id="comment"
                 label="Comment"
@@ -111,6 +103,14 @@ export default function RsvpForm(props: RSVPModalProps) {
                 value={comment}
                 onChange={(event) => setComment(event.target.value)}
             />
+
+            <Collapsable title="Supplies">
+                <LabeledCounterGroup labels={supplies} onChange={(supplies) => setSupplies(supplies)} />
+            </Collapsable>
+
+            <Collapsable title="Guests">
+                <ListInput placeholder="Guest" items={guests} onChange={(guests) => setGuests(guests)} />
+            </Collapsable>
 
             <LoadingButton
                 type="submit"
