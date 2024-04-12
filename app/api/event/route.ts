@@ -10,6 +10,8 @@ export async function POST(request: Request): Promise<Response> {
         cancelled,
         defaultSupplies,
         location,
+        privateEvent,
+        customUrl
     } = await request.json();
 
     const event = await createEvent({
@@ -22,6 +24,8 @@ export async function POST(request: Request): Promise<Response> {
         defaultSupplies,
         changelog: [],
         attendees: [],
+        privateEvent,
+        customUrl
     });
     
     return new Response(JSON.stringify(event), { status: 201 });

@@ -396,6 +396,12 @@ export default function EventPage({ event }: EventPageProps) {
 
     return (
         <div>
+            {event.privateEvent && (
+                <Alert severity="info" style={{ marginBottom: 16 }}>
+                    This is a private event.<br />Only guests with the link can view it.
+                </Alert>
+            )}
+
             {event.cancelled && (
                 <Alert severity="error" style={{ marginBottom: 16 }}>
                     This event has been cancelled

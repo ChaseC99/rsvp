@@ -24,6 +24,10 @@ model Event {
   defaultSupplies String[]   @default([])
   changelog       String[]
   attendees       Attendee[]
+
+  
+  privateEvent    Boolean    @default(false)
+  customUrl       String?    @unique
 }
 
 model Attendee {

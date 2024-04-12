@@ -2,11 +2,12 @@
 
 import { useRef, useState } from "react";
 import { LoadingButton } from "@mui/lab";
-import { Autocomplete, TextField } from "@mui/material";
+import { Autocomplete, TextField, Checkbox, FormControlLabel } from "@mui/material";
 import Collapsable from "./collapsable";
 import ListInput from "./list-input";
 import DatePicker from "../_components/date-picker";
 import { Event } from "../types";
+import { useFlag } from "../_utils/helpers";
 
 
 type EventFormProps = {
@@ -17,10 +18,14 @@ type EventFormProps = {
 export default function EventForm(props: EventFormProps) {
     const { event, submitButtonText, onSubmit } = props;
 
+    const enableAdvancedFeatures = useFlag("advanced")
+
     const [submitIsLoading, setSubmitIsLoading] = useState(false);
     const [title, setTitle] = useState(event?.title || "");
     const [date, setDate] = useState(event?.date || "");
     const [defaultSupplies, setDefaultSupplies] = useState(event?.defaultSupplies || []);
+    const [privateEvent, setPrivateEvent] = useState(event?.privateEvent || false);
+    const customUrlRef = useRef<HTMLTextAreaElement>(null);
     const descriptionRef = useRef<HTMLTextAreaElement>(null);
     const locationRef = useRef<HTMLInputElement>(null);
 
@@ -30,6 +35,7 @@ export default function EventForm(props: EventFormProps) {
 
         const description = descriptionRef.current?.value;
         const location = locationRef.current?.value;
+        const customUrl = customUrlRef.current?.value;
 
         const event = {
             title,
@@ -37,6 +43,8 @@ export default function EventForm(props: EventFormProps) {
             description,
             location,
             defaultSupplies,
+            privateEvent,
+            customUrl
         };
 
         await onSubmit(event);
@@ -96,6 +104,28 @@ export default function EventForm(props: EventFormProps) {
                     onChange={(defaultSupplies) => setDefaultSupplies(defaultSupplies)} 
                 />
             </Collapsable>
+
+            { enableAdvancedFeatures && (
+                <Collapsable title="Advanced Features" outlined={true}>
+                    <div style={styles.form}>
+                        <p>Welcome to the admin zone 😎</p>
+                        <TextField
+                            id="customUrl"
+                            label="Custom ID"
+                            variant="outlined"
+                            multiline
+                            inputRef={customUrlRef}
+                            defaultValue={event?.customUrl}
+                        />
+                        <FormControlLabel 
+                            control={
+                                <Checkbox checked={privateEvent} onChange={(event) => setPrivateEvent(event.target.checked)} />
+                            } 
+                            label={privateEvent ? "Private Event (⚠️ Only visible to those who have the link)" : "Private Event" }
+                        />
+                    </div>
+                </Collapsable>
+            )}
 
             <LoadingButton
                 disabled={title === ""}

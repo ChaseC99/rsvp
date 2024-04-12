@@ -24,8 +24,9 @@ export async function loadEvents(includePastEvents = false): Promise<Event[]> {
             where: {
                 date: {
                     // All events newer than 24 hours ago
-                    gte: new Date(Date.now() - ONE_DAY)
-                }
+                    gte: new Date(Date.now() - ONE_DAY),
+                },
+                privateEvent: false
             },
             include: {
                 attendees: {
@@ -46,7 +47,7 @@ export async function loadEvents(includePastEvents = false): Promise<Event[]> {
  * @returns event if it exists
  */
 export async function loadEvent(id: string): Promise<Event | null> {
-    const event = await prisma.event.findUnique({
+    var event = await prisma.event.findUnique({
         where: {
             id: id
         },
@@ -59,6 +60,24 @@ export async function loadEvent(id: string): Promise<Event | null> {
             }
         }
     });
+
+    if (!event) {
+        // Check agin for a custom url
+        event = await prisma.event.findUnique({
+            where: {
+                customUrl: id
+            },
+            include: {
+                attendees: {
+                    include: { supplies: true },
+                    orderBy: {
+                        createdAt: 'asc'
+                    }
+                }
+            }
+        });
+    }
+
     return event;
 }
 
