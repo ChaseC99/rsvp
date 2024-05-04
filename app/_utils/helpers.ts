@@ -1,3 +1,4 @@
+import { customAlphabet } from "nanoid";
 import { Attendee } from "../types";
 
 /**
@@ -34,4 +35,18 @@ export function useFlag(flag: string): boolean {
     } else {
         return false;
     }
+}
+
+/**
+ * Generate Id
+ * 
+ * Generates a random 6 character alphanumeric string.
+ * This should be able to generate 6k unique ids before a 1% chance of collision.
+ * Nano ID Collision Probability: https://zelark.github.io/nano-id-cc/
+ * 
+ * @returns a unique id
+ */
+export function generateId(): string {
+    const nanoid = customAlphabet('0123456789abcdefghijklmnopqrstuvwxyz', 6);
+    return nanoid();
 }

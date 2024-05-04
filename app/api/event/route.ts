@@ -1,9 +1,9 @@
+import { generateId } from "@/app/_utils/helpers";
 import { createEvent, updateEvent, deleteEvent, cancelEvent } from "@/app/queries";
 
 // Create a new event
 export async function POST(request: Request): Promise<Response> {
     const {
-        id,
         title,
         date,
         description,
@@ -15,7 +15,7 @@ export async function POST(request: Request): Promise<Response> {
     } = await request.json();
 
     const event = await createEvent({
-        id,
+        id: generateId(),
         title,
         date: new Date(date),
         description,

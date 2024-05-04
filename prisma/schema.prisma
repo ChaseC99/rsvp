@@ -15,7 +15,7 @@ datasource db {
 }
 
 model Event {
-  id              String     @id @unique @default(uuid())
+  id              String     @id @unique @default(cuid())
   title           String
   date            DateTime
   description     String
@@ -31,7 +31,7 @@ model Event {
 }
 
 model Attendee {
-  id        String   @id @default(uuid())
+  id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   name      String
   guests    String[]
@@ -44,7 +44,7 @@ model Attendee {
 }
 
 model Supply {
-  id       String @id @default(uuid())
+  id       String @id @default(cuid())
   item     String
   quantity Int
 
