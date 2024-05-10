@@ -26,19 +26,10 @@ export default function Home() {
 
     return (
         <div>
-            <div style={styles.header}>
-                <Typography>
-                    This site is still on the way...
-                </Typography>
-                <DirectionsRunIcon />
-            </div>
-            <Divider />
-
             {isLoading ? 
                 <Spinner /> :
                 <EventsList events={events} />
             }
-
         </div>
     )
 }
