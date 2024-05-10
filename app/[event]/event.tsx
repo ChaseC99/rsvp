@@ -11,6 +11,7 @@ import PublicTwoToneIcon from '@mui/icons-material/PublicTwoTone';
 import CalendarMonthTwoToneIcon from '@mui/icons-material/CalendarMonthTwoTone';
 import PeopleIcon from '@mui/icons-material/People';
 import ScheduleIcon from '@mui/icons-material/Schedule';
+import JSConfetti from 'js-confetti'
 
 import RsvpForm from "./rsvp-form";
 import { getAttendeeCount, getMaybeCount } from "../_utils/helpers";
@@ -325,6 +326,13 @@ export default function EventPage({ event }: EventPageProps) {
         // TODO: handle response
 
         router.refresh();
+
+        if (event.title.toLowerCase().includes('volleyball')) {
+            const jsConfetti = new JSConfetti()
+            jsConfetti.addConfetti({
+                emojis: ['🏐'],
+            })
+        }
 
         // Wait half a second, then show the calendar tooltip
         // to let the user know they can download the event
