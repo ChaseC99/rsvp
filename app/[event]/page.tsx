@@ -40,7 +40,10 @@ export async function generateMetadata(
         }
     }
 
+    const dateString = event.date.toLocaleDateString('en-US', { weekday: 'long', month: 'numeric', day: 'numeric' })
+    const title = `${event.title} | ${dateString}`;
+
     return {
-        title: event.title,
+        title: title,
     }
 };
