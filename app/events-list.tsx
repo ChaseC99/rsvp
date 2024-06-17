@@ -8,39 +8,51 @@ import type { Event } from "./types";
 export default function EventsList({ events }: { events: Event[] }) {
     return (
         <div style={styles.wrapper}>
-            {events.map(({ title, id, date, location, attendees, cancelled }) => (
-                <Link key={id} href={`/${id}`}>
-                    <Card style={styles.card}>
-                        <div style={styles.cardHeader}>
-                            <Typography variant='h3' style={{...styles.title, ...(cancelled && styles.cancelled)}}>
-                                {title}
-                            </Typography>
-                            <div style={styles.attendeeCount}>
-                                <Typography style={styles.count}>
-                                    {getAttendeeCount(attendees)}
+            {events.map(({ title, id, date, location, attendees, cancelled }) => {
+                const dateString = date.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })
+                const timeString = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })
+
+                return (
+                    <Link key={id} href={`/${id}`}>
+                        <Card style={styles.card}>
+                            <div style={styles.cardHeader}>
+                                <Typography variant='h3' style={{ ...styles.title, ...(cancelled && styles.cancelled) }}>
+                                    {title}
                                 </Typography>
-                                <AccountCircleIcon fontSize="large" />
+                                <div style={styles.attendeeCount}>
+                                    <Typography style={styles.count}>
+                                        {getAttendeeCount(attendees)}
+                                    </Typography>
+                                    <AccountCircleIcon fontSize="large" />
+                                </div>
                             </div>
-                        </div>
-                        <div style={{...(cancelled && styles.cancelled)}}>
-                            <Typography variant='body1' style={{ display: "flex", gap: "0.5rem" }}>
-                                {date.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
-                                <Divider orientation="vertical" flexItem />
-                                {date.toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })}
-                            </Typography>
-                            <Typography variant='body1'>
-                                {location}
-                            </Typography>
-                        </div>
-                        {cancelled && (
-                            <Alert severity="error" style={{marginTop: 16}}>
-                                This event has been cancelled
-                            </Alert>
-                        )}
-                    </Card>
-                </Link>
-            ))
-            }
+                            <div style={{ ...(cancelled && styles.cancelled) }}>
+                                <Typography variant='body1' style={{ display: "flex", gap: "0.5rem" }}>
+                                    {dateString}
+                                    {
+                                        // Don't show the time if it's 12:00 AM
+                                        // 12:00 AM is the default when no time is specified
+                                        timeString !== '12:00 AM' && (
+                                            <>
+                                                <Divider orientation="vertical" flexItem />
+                                                {timeString}
+                                            </>
+                                        )
+                                    }
+                                </Typography>
+                                <Typography variant='body1'>
+                                    {location}
+                                </Typography>
+                            </div>
+                            {cancelled && (
+                                <Alert severity="error" style={{ marginTop: 16 }}>
+                                    This event has been cancelled
+                                </Alert>
+                            )}
+                        </Card>
+                    </Link>
+                )
+            })}
         </div >
     )
 }
