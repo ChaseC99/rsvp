@@ -40,7 +40,16 @@ export async function generateMetadata(
         }
     }
 
-    const dateString = event.date.toLocaleDateString('en-US', { weekday: 'long', month: 'numeric', day: 'numeric' })
+    const dateString = event.date.toLocaleDateString(
+        'en-US', 
+        { 
+            weekday: 'long', 
+            month: 'numeric', 
+            day: 'numeric', 
+            // HACK: Server is UTC but client is most likely Pacific Time, 
+            // so force the timezone to be Pacific Time
+            timeZone: "America/Los_Angeles" 
+        })
     const title = `${event.title} | ${dateString}`;
 
     return {
