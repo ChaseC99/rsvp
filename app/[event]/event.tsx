@@ -21,6 +21,7 @@ import EventMenu from "./event-menu";
 import CalendarDownload from "./calendar-download";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import ShareButton from "../_components/share-button";
 
 type EventDetailProps = {
     icon: React.ReactNode,
@@ -453,6 +454,8 @@ export default function EventPage({ event }: EventPageProps) {
                 </Button>
 
                 <div style={styles.iconButtons}>
+                    <ShareButton />
+
                     <CalendarDownload
                         event={event}
                         disabled={event.cancelled}

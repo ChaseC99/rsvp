@@ -26,6 +26,8 @@ export default function LoadingEvent() {
                 {/* RSVP Button */}
                 <Skeleton variant="rounded" animation={false} height={50} width={100} />  
                 <div style={{display: "flex", gap: 32}}>
+                    {/* Share Button */}
+                    <Skeleton variant="rounded" animation={false} height={35} width={35} />  
                     {/* Calendar Button */}
                     <Skeleton variant="rounded" animation={false} height={35} width={35} />  
                     {/* Edit Button */}
