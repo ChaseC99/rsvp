@@ -1,0 +1,11 @@
+{
+    "name": "RSVP",
+    "short_name": "RSVP",
+    "display": "standalone",
+    "theme_color": "#1976d2",
+    "background_color": "#1976d2",
+    "orientation": "portrait",
+    "start_url": "/",
+    "scope": "/",
+    "splash_pages": null
+}
