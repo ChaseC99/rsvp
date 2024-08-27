@@ -86,7 +86,7 @@ const styles = {
         fontWeight: 400,
         fontSize: "0.75rem",
         color: "rgba(0, 0, 0, 0.6)",
-        top: "-8px",
+        top: "-10px",
         left: "10px",
         position: "relative" as "relative",
         background: "white",
