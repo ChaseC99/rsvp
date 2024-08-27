@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { LoadingButton } from "@mui/lab";
-import { Autocomplete, TextField, Checkbox, FormControlLabel } from "@mui/material";
+import { Autocomplete, TextField, Checkbox, FormControlLabel, InputAdornment } from "@mui/material";
 import Collapsable from "./collapsable";
 import ListInput from "./list-input";
 import DatePicker from "../_components/date-picker";
@@ -25,6 +25,7 @@ export default function EventForm(props: EventFormProps) {
     const [date, setDate] = useState(event?.date || "");
     const [defaultSupplies, setDefaultSupplies] = useState(event?.defaultSupplies || []);
     const [privateEvent, setPrivateEvent] = useState(event?.privateEvent || false);
+    const durationRef = useRef<HTMLInputElement>(null);
     const customUrlRef = useRef<HTMLTextAreaElement>(null);
     const descriptionRef = useRef<HTMLTextAreaElement>(null);
     const locationRef = useRef<HTMLInputElement>(null);
@@ -33,6 +34,7 @@ export default function EventForm(props: EventFormProps) {
         e.preventDefault();
         setSubmitIsLoading(true);
 
+        const duration = durationRef.current?.value ? parseFloat(durationRef.current.value) : null;
         const description = descriptionRef.current?.value;
         const location = locationRef.current?.value;
         const customUrl = customUrlRef.current?.value;
@@ -40,6 +42,7 @@ export default function EventForm(props: EventFormProps) {
         const event = {
             title,
             date: new Date(date),
+            duration,
             description,
             location,
             defaultSupplies,
@@ -68,6 +71,17 @@ export default function EventForm(props: EventFormProps) {
                 onChange={setDate} 
                 defaultValue={event?.date} 
                 label="Start Time"
+            />
+
+            <TextField 
+                type="number"
+                label="Duration"
+                variant="outlined"
+                inputRef={durationRef}
+                defaultValue={event?.duration}
+                InputProps={{
+                    endAdornment: <InputAdornment position="end">hours</InputAdornment>,
+                }}
             />
 
             <Autocomplete

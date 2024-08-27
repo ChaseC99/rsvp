@@ -18,6 +18,7 @@ model Event {
   id              String     @id @unique @default(cuid())
   title           String
   date            DateTime
+  duration        Float?
   description     String
   location        String
   cancelled       Boolean    @default(false)

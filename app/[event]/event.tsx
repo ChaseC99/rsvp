@@ -222,7 +222,7 @@ export default function EventPage({ event }: EventPageProps) {
     const [rsvpDefaultValues, setRsvpDefaultValues] = useState<Partial<Attendee> | null>(null);
     const [calendarTooltipOpen, setCalendarTooltipOpen] = useState(false);
     const deleteEventPasswordRef = useRef<HTMLInputElement>(null);
-    const { title, id, date, description, location, attendees, changelog } = event;
+    const { title, id, date, duration, description, location, attendees, changelog } = event;
     const supplies = getSuppliesFromAttendees(attendees);
 
     const handleEditEvent = async (event: Partial<Event>) => {
@@ -397,11 +397,27 @@ export default function EventPage({ event }: EventPageProps) {
         setShowEditRsvp(true);
     }
 
-    const eventDate = date.toDateString();
-    const eventTime = date.toLocaleTimeString([], {
-        hour: 'numeric',
-        minute: '2-digit',
-    });
+    // Generate the strings for the eventDate and eventTime
+    // If the event has a duration, show the start and end time
+    //    e.g. "5:00 PM - 7:00 PM"
+    // If the event spans multiple days, show the date range and duration
+    //    e.g. "Friday, October 1 - Sunday, October 3
+    //          5:00 PM | 48 hours"
+    const endDate = new Date(date.getTime() + (duration || 0) * 60 * 60 * 1000);
+
+    var eventDate = date.toDateString();
+    const eventEndDate = endDate.toDateString();
+    if (eventDate !== eventEndDate) {
+        eventDate += ` - ${eventEndDate}`;
+    }
+
+    var eventTime = date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    const endEventTime = endDate.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    if (eventDate !== eventEndDate) {
+        eventTime += ` | ${duration} hours`;
+    } else if (eventTime !== endEventTime) {
+        eventTime += ` - ${endEventTime}`;
+    }
 
     return (
         <div>

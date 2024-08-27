@@ -21,12 +21,13 @@ export default function CalendarDownload({ event, disabled, tooltipOpen, onOpen,
     // Google Calendar requires the date to be in a specific format
     // YYYYMMDDTHHmmSSZ/YYYYMMDDTHHmmSSZ
     const date = event.date.toISOString().replace(/-|:|\.\d+/g, '');
+    const endDate = new Date(event.date.getTime() + (event.duration || 0) * 60 * 60 * 1000).toISOString().replace(/-|:|\.\d+/g, '');
 
     // Google Calendar add event url reference: https://github.com/InteractionDesignFoundation/add-event-to-calendar-docs/blob/main/services/google.md#parameters
     const gcalAddEventUrl = new URL('https://www.google.com/calendar/render');
     gcalAddEventUrl.searchParams.append('action', 'TEMPLATE');
     gcalAddEventUrl.searchParams.append('text', title);
-    gcalAddEventUrl.searchParams.append('dates', `${date}/${date}`);
+    gcalAddEventUrl.searchParams.append('dates', `${date}/${endDate}`);
     gcalAddEventUrl.searchParams.append('details', description);
     gcalAddEventUrl.searchParams.append('location', location);
 
