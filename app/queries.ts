@@ -23,8 +23,8 @@ export async function loadEvents(includePastEvents = false): Promise<Event[]> {
         await prisma.event.findMany({
             where: {
                 date: {
-                    // All events newer than 24 hours ago
-                    gte: new Date(Date.now() - ONE_DAY),
+                    // All events newer than 12 hours ago
+                    gte: new Date(Date.now() - ONE_DAY/2),
                 },
                 privateEvent: false
             },
