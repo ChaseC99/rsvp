@@ -101,7 +101,6 @@ export default function EventForm(props: EventFormProps) {
                 defaultValue={event?.location}
             />
 
-
             <TextField
                 id="description"
                 label="Description"
@@ -119,8 +118,17 @@ export default function EventForm(props: EventFormProps) {
                 />
             </Collapsable>
 
+            <Collapsable title="Advanced" outlined={true}>
+                <FormControlLabel 
+                    control={
+                        <Checkbox checked={privateEvent} onChange={(event) => setPrivateEvent(event.target.checked)} />
+                    } 
+                    label="Private Event"
+                />
+            </Collapsable>
+
             { enableAdvancedFeatures && (
-                <Collapsable title="Advanced Features" outlined={true}>
+                <Collapsable title="Admin Features" outlined={true}>
                     <div style={styles.form}>
                         <p>Welcome to the admin zone 😎</p>
                         <TextField
@@ -130,12 +138,6 @@ export default function EventForm(props: EventFormProps) {
                             multiline
                             inputRef={customUrlRef}
                             defaultValue={event?.customUrl}
-                        />
-                        <FormControlLabel 
-                            control={
-                                <Checkbox checked={privateEvent} onChange={(event) => setPrivateEvent(event.target.checked)} />
-                            } 
-                            label={privateEvent ? "Private Event (⚠️ Only visible to those who have the link)" : "Private Event" }
                         />
                     </div>
                 </Collapsable>
