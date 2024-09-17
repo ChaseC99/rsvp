@@ -59,7 +59,7 @@ function Location({ location }: LocationProps) {
         `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`;
 
     return (
-        <a href={mapsUrl} target="_blank">
+        <a href={mapsUrl} target="_blank" style={styles.location}>
             <EventDetail
                 icon={<PublicTwoToneIcon />}
                 text={location}
@@ -608,8 +608,12 @@ const styles = {
     iconButtons: {
         display: 'flex',
     },
+    location: {
+        textDecoration: 'none',
+    },
     markdownText: {
         whiteSpace: 'pre-wrap' as const,
+        listStylePosition: 'inside' as const,
 
         // Styling to match the Typography component
         fontFamily: '"Roboto","Helvetica","Arial",sans-serif',

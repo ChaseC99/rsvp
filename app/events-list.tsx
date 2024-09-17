@@ -13,7 +13,7 @@ export default function EventsList({ events }: { events: Event[] }) {
                 const timeString = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })
 
                 return (
-                    <Link key={id} href={`/${id}`}>
+                    <Link key={id} href={`/${id}`} style={styles.link}>
                         <Card style={styles.card}>
                             <div style={styles.cardHeader}>
                                 <Typography variant='h3' style={{ ...styles.title, ...(cancelled && styles.cancelled) }}>
@@ -66,6 +66,9 @@ const styles = {
         display: "flex",
         flexDirection: "column" as "column",
         gap: "2rem",
+    },
+    link: {
+        textDecoration: "none",
     },
     card: {
         padding: "2rem",
