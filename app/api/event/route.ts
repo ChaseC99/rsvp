@@ -3,31 +3,15 @@ import { createEvent, updateEvent, deleteEvent, cancelEvent } from "@/app/querie
 
 // Create a new event
 export async function POST(request: Request): Promise<Response> {
-    const {
-        title,
-        date,
-        description,
-        duration,
-        cancelled,
-        defaultSupplies,
-        location,
-        privateEvent,
-        customUrl
-    } = await request.json();
+    const eventInfo = await request.json();
 
     const event = await createEvent({
         id: generateId(),
-        title,
-        date: new Date(date),
-        description,
-        duration,
-        location,
-        cancelled,
-        defaultSupplies,
+        date: new Date(eventInfo.date),
         changelog: [],
         attendees: [],
-        privateEvent,
-        customUrl
+
+        ...eventInfo,
     });
     
     return new Response(JSON.stringify(event), { status: 201 });
