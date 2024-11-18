@@ -222,7 +222,7 @@ export default function EventPage({ event }: EventPageProps) {
     const [rsvpDefaultValues, setRsvpDefaultValues] = useState<Partial<Attendee> | null>(null);
     const [calendarTooltipOpen, setCalendarTooltipOpen] = useState(false);
     const deleteEventPasswordRef = useRef<HTMLInputElement>(null);
-    const { title, id, date, duration, description, location, attendees, changelog } = event;
+    const { title, id, date, duration, description, location, attendees, changelog, coverPhoto } = event;
     const supplies = getSuppliesFromAttendees(attendees);
 
     const handleEditEvent = async (event: Partial<Event>) => {
@@ -436,6 +436,10 @@ export default function EventPage({ event }: EventPageProps) {
                 <Typography variant="h2">
                     {title}
                 </Typography>
+                { 
+                    // This is a XSS vulnerability waiting to happen lol
+                    coverPhoto && <img src={coverPhoto} alt="Cover photo" style={styles.coverPhoto} />
+                }
             </div>
 
             <div style={{ ...styles.details, ...(event.cancelled ? styles.cancelled : {}) }}>
@@ -589,6 +593,12 @@ const styles = {
     },
     header: {
         marginBottom: '1rem',
+    },
+    coverPhoto: {
+        width: '100%',
+        height: 'auto',
+        margin: '1rem 0',
+        borderRadius: '4px',
     },
     details: {
         margin: '1rem 0',

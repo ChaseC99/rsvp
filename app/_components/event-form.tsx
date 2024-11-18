@@ -25,6 +25,7 @@ export default function EventForm(props: EventFormProps) {
     const [date, setDate] = useState(event?.date || "");
     const [defaultSupplies, setDefaultSupplies] = useState(event?.defaultSupplies || []);
     const [privateEvent, setPrivateEvent] = useState(event?.privateEvent || false);
+    const [coverPhoto, setCoverPhoto] = useState(event?.coverPhoto || "");
     const durationRef = useRef<HTMLInputElement>(null);
     const customUrlRef = useRef<HTMLTextAreaElement>(null);
     const descriptionRef = useRef<HTMLTextAreaElement>(null);
@@ -47,6 +48,7 @@ export default function EventForm(props: EventFormProps) {
             location,
             defaultSupplies,
             privateEvent,
+            coverPhoto,
             customUrl
         };
 
@@ -119,12 +121,27 @@ export default function EventForm(props: EventFormProps) {
             </Collapsable>
 
             <Collapsable title="Advanced" outlined={true}>
-                <FormControlLabel 
-                    control={
-                        <Checkbox checked={privateEvent} onChange={(event) => setPrivateEvent(event.target.checked)} />
-                    } 
-                    label="Private Event"
-                />
+                <div style={styles.form}>
+                    <FormControlLabel 
+                        control={
+                            <Checkbox checked={privateEvent} onChange={(event) => setPrivateEvent(event.target.checked)} />
+                        } 
+                        label="Private Event"
+                    />
+
+                        <TextField
+                            id="coverPhoto"
+                            label="Cover Photo URL"
+                            variant="outlined"
+                            value={coverPhoto}
+                            onChange={(event) => setCoverPhoto(event.target.value)}
+                        />
+                    
+                    {
+                        coverPhoto && 
+                        <img src={coverPhoto} style={{maxWidth: "100%"}} />
+                    }
+                </div>
             </Collapsable>
 
             { enableAdvancedFeatures && (
