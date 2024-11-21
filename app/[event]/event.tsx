@@ -599,7 +599,7 @@ const styles = {
         maxHeight: '600px',
         margin: '1rem 0',
         borderRadius: '4px',
-        resizeMode: 'center',
+        objectFit: 'contain' as 'contain',
     },
     details: {
         margin: '1rem 0',
