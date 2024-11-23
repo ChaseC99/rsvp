@@ -595,10 +595,11 @@ const styles = {
         marginBottom: '1rem',
     },
     coverPhoto: {
-        width: '100%',
-        height: 'auto',
+        maxWidth: '100%',
+        maxHeight: '600px',
         margin: '1rem 0',
         borderRadius: '4px',
+        objectFit: 'contain' as 'contain',
     },
     details: {
         margin: '1rem 0',
