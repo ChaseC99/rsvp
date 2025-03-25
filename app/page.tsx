@@ -5,6 +5,7 @@ import EventsList from "./events-list";
 import DirectionsRunIcon from '@mui/icons-material/DirectionsRun';
 import { Event } from './types';
 import Spinner from './_components/spinner';
+import { loadEventsList } from './_utils/helpers';
 
 export default function Home() {
     const [events, setEvents] = useState<Event[]>([]);
@@ -12,14 +13,9 @@ export default function Home() {
 
     // Fetch events from API
     useEffect(() => {
-        fetch('/api/events')
-            .then((response) => response.json())
-            .then((data) => {
-                const events = data.map((event: Event) => ({
-                    ...event,
-                    date: new Date(event.date),
-                }));
-                setEvents(events)
+        loadEventsList()
+            .then((events) => {
+                setEvents(events);
                 setIsLoading(false);
             });
     }, []);

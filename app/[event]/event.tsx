@@ -14,7 +14,7 @@ import ScheduleIcon from '@mui/icons-material/Schedule';
 import JSConfetti from 'js-confetti'
 
 import RsvpForm from "./rsvp-form";
-import { getAttendeeCount, getMaybeCount } from "../_utils/helpers";
+import { savePrivateEventId, getAttendeeCount, getMaybeCount } from "../_utils/helpers";
 import EventForm from "../_components/event-form";
 import ModalContent from "../_components/modal-content";
 import EventMenu from "./event-menu";
@@ -224,6 +224,13 @@ export default function EventPage({ event }: EventPageProps) {
     const deleteEventPasswordRef = useRef<HTMLInputElement>(null);
     const { title, id, date, duration, description, location, attendees, changelog, coverPhoto } = event;
     const supplies = getSuppliesFromAttendees(attendees);
+
+    // If the event is private, store the event id in local storage
+    useEffect(() => {
+        if (event.privateEvent) {
+            savePrivateEventId(id);
+        }
+    }, [event.privateEvent, id]);
 
     const handleEditEvent = async (event: Partial<Event>) => {
         const endpoint = `/api/event`;

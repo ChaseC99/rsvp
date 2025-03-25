@@ -10,7 +10,7 @@ import { ONE_DAY } from './_utils/constants';
  * Loads all events
  * @returns a list of all events
  */
-export async function loadEvents(includePastEvents = false): Promise<Event[]> {
+export async function loadEvents(privateIds: string[] = [], includePastEvents = false): Promise<Event[]> {
     const events = includePastEvents ?
         await prisma.event.findMany({
             include: {
@@ -26,7 +26,10 @@ export async function loadEvents(includePastEvents = false): Promise<Event[]> {
                     // All events newer than 12 hours ago
                     gte: new Date(Date.now() - ONE_DAY/2),
                 },
-                privateEvent: false
+                OR: [
+                    { privateEvent: false },
+                    { id: { in: privateIds } }
+                ]
             },
             include: {
                 attendees: {

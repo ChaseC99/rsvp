@@ -1,5 +1,5 @@
 import { customAlphabet } from "nanoid";
-import { Attendee } from "../types";
+import { Attendee, Event } from "../types";
 
 /**
  * Get Attendee Count
@@ -49,4 +49,54 @@ export function useFlag(flag: string): boolean {
 export function generateId(): string {
     const nanoid = customAlphabet('0123456789abcdefghijklmnopqrstuvwxyz', 6);
     return nanoid();
+}
+
+/**
+ * Get Stored Private Event Ids
+ */
+export function getStoredPrivateEventIds(): string[] {
+    if (typeof window !== "undefined") { 
+        const privateEventIds = localStorage.getItem("private_event_ids");
+        return privateEventIds ? JSON.parse(privateEventIds) : [];
+    } else {
+        return [];
+    }
+}
+
+/**
+ * Save Private Event Id
+ * 
+ * Adds a private event id to local storage if it doesn't already exist.
+ * This is used to store private event ids that the user has seen.
+ */
+export function savePrivateEventId(eventId: string): void {
+    if (typeof window !== "undefined") { 
+        const privateEventIds = getStoredPrivateEventIds();
+
+        // Check if the event ID already exists in local storage
+        if (!privateEventIds.includes(eventId)) {
+            localStorage.setItem("private_event_ids", JSON.stringify([...privateEventIds, eventId]));
+        }
+    }
+}
+
+/** 
+ * Load Events
+ */
+export function loadEventsList(): Promise<Event[]> {
+    // Load private event IDs stored in local storage
+    const privateEventIds = getStoredPrivateEventIds().join(',');
+
+    const eventsUrl = privateEventIds
+        ? `/api/events?private_ids=${privateEventIds}`
+        : '/api/events';
+
+    return fetch(eventsUrl)
+        .then((response) => response.json())
+        .then((data) => {
+            return data.map((event: Event) => ({
+                ...event,
+                date: new Date(event.date),
+            }));
+        });
 }

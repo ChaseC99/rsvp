@@ -18,6 +18,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import { Event } from './types';
+import { loadEventsList } from './_utils/helpers';
 
 export default function Navbar() {
     const router = useRouter();
@@ -26,16 +27,10 @@ export default function Navbar() {
 
     // Fetch events from API
     useEffect(() => {
-        fetch('/api/events')
-            .then((response) => response.json())
-            .then((data) => {
-                const events = data.map((event: Event) => ({
-                    ...event,
-                    date: new Date(event.date),
-                }));
-                setEvents(events)
-            }
-            );
+        loadEventsList()
+            .then((events) => {
+                setEvents(events);
+            });
     }, []);
 
     return (
