@@ -98,7 +98,7 @@ export default function EventForm(props: EventFormProps) {
                     />
                 )}
                 options={[
-                    "Las Palmas Park", "Kevin Moran Park", "Washington Park"
+                    "Las Palmas Park", "Kevin Moran Park", "Washington Park", "Montlake Playfield", "Greenlake Park"
                 ]}
                 defaultValue={event?.location}
             />
